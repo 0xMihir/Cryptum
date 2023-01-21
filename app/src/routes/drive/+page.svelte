@@ -12,6 +12,22 @@
                 "uuid": "bleeeh"
             },
             {
+                "type": "directory",
+                "name": "people",
+                "children": [
+                    {
+                        "type": "file",
+                        "name": "bob ross.txt",
+                        "uuid": "86"
+                    },
+                    {
+                        "type": "file",
+                        "name": "kanye west.txt",
+                        "uuid": "23"
+                    }
+                ]
+            },
+            {
                 "type": "file",
                 "name": "bruhv",
                 "uuid": "uuid2"
