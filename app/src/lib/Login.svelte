@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { redirect } from '@sveltejs/kit';
     import tk from '$lib/TKey';
+	import "@fontsource/roboto";
 	const commands = tk.commands;
 
 	async function doesUserExist(uuid: String) {
@@ -31,6 +32,22 @@
 			console.log('error');
 		}
 	}
+
+	async function getname(uuid: String) {
+		const response = await fetch('/api/getname', {
+			method: 'POST',
+			body: JSON.stringify({ uuid }),
+			headers: {
+				'content-type': 'application/json'
+			}
+		});
+		if (response.ok) {
+			const data = await response.json();
+			return data;
+		} else {
+			console.log('error');
+		}
+	}
 	// pass wr_zAhUEuJ3IrtO9d8t_-A
 	// user cygnusx26
 	// doesUserExist('cygnusx26', 'wr_zAhUEu').then((data) => {
@@ -38,13 +55,17 @@
 	//     });
 	const login = async () => {
         const str = await getstr(); // random string
-		const data = await doesUserExist('wr_zAhUEu');
-		if (data.exists) {
-			console.log('user exists');
+		const uuid = 'sample_pubkey' // TODO: get pubkey from tkey
+		const data = await doesUserExist(uuid);
+		const name = await getname(uuid);
+		console.log();
+		if (data["exists"]) {
+			setCookie('uuid', uuid);
+			setCookie('name',name["results"][0]["name"]);
 			return await goto('/drive');
 		} else {
-			console.log('user does nsot exist');
-			return await goto('/drive');
+			setCookie('uuid', uuid);
+			return await goto('/create');
 		}
         
 		let port = await navigator.serial.requestPort({
@@ -62,6 +83,35 @@
 
         
 	};
+	/*
+	* General utils for managing cookies in Typescript.
+	*/
+	function setCookie(name: string, val: string) {
+		const date = new Date();
+		const value = val;
+
+		// Set it expire in 7 days
+		date.setTime(date.getTime() + (7 * 24 * 60 * 60 * 1000));
+
+		// Set it
+		document.cookie = name+"="+value+"; expires="+date.toUTCString()+"; path=/";
+	}
 </script>
 
 <button on:click={login}>Login</button>
+
+
+<style>
+	button {
+		background-image: linear-gradient(to left, #FF0790, #2300FF); /* Green */
+		border: none;
+		font-family: 'Roboto', sans-serif;
+		color: white;
+		padding: 20px 32px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		border-radius: 30px;
+		font-size: 16px;
+	}
+</style>

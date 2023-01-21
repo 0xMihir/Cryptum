@@ -9,7 +9,6 @@ export const POST = (async ({ request }) => {
 	const client = new Client(DATABASEURL); //process.env.DATABASE_URL
 	try {
 		await client.connect();
-		await client.query('CREATE TABLE IF NOT EXISTS users (name TEXT, uuid TEXT)');
 	} catch (e) {
 		throw error(500, 'Could not connect to database');
 	}
@@ -22,7 +21,7 @@ export const POST = (async ({ request }) => {
 	};
 	const results = await (await client.query(query)).rows;
 	if (results.length > 0) {
-		return new Response(JSON.stringify({ exists: true }));
+		return new Response(JSON.stringify({ exists: true, results: results}));
 	} else {
 		return new Response(JSON.stringify({ exists: false }));
 	}
