@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { redirect } from '@sveltejs/kit';
     import tk from '$lib/TKey';
+	import "@fontsource/roboto";
 	const commands = tk.commands;
 
 	async function doesUserExist(uuid: String) {
@@ -98,3 +99,19 @@
 </script>
 
 <button on:click={login}>Login</button>
+
+
+<style>
+	button {
+		background-image: linear-gradient(to left, #FF0790, #2300FF); /* Green */
+		border: none;
+		font-family: 'Roboto', sans-serif;
+		color: white;
+		padding: 20px 32px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		border-radius: 30px;
+		font-size: 16px;
+	}
+</style>
