@@ -33,7 +33,9 @@
 	"dependencies": {
 		"@types/w3c-web-serial": "^1.0.3",
 		"blakejs": "^1.2.1",
+		"bootstrap": "^5.2.3",
 		"sequelize": "^6.28.0",
-		"sequelize-cockroachdb": "^6.0.5"
+		"sequelize-cockroachdb": "^6.0.5",
+		"sveltestrap": "^5.10.0"
 	}
 }

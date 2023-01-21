@@ -18,28 +18,30 @@ export class INode {
 
 			const children = fileData['children'];
 
-			if (type == 'file' && fileData['uuid'] != null) {
-				return new UnloadedFile(name, fileData['uuid']);
-			} else if (type == 'directory' && children != null) {
-				const newDirectory = new Directory(name);
+            if (type == "file" && fileData["uuid"] != null) {
+                return new UnloadedFile(name, fileData["uuid"]);
+            } else if (type == "directory" && children != null) {
+                const newDirectory = new Directory(name);
 
-				for (const data in Object.values(children)) {
-					newDirectory.addChild(parseInode(data as any));
-				}
+                for (const data in Object.values(children)) {
+                    newDirectory.addChild(parseInode(data as any));
+                }
+                
+                return newDirectory;
+            } else {
+                throw {};
+            }
+        }
 
-				return newDirectory;
-			} else {
-				throw {};
-			}
-		}
+        try {
+            const jsonData = JSON.parse(json);
+            if (jsonData["type"])
 
-		try {
-			const jsonData = JSON.parse(json);
-			if (jsonData['type']) return parseInode(jsonData);
-		} catch (e) {}
+            return parseInode(jsonData);
+        } catch (e) {}
 
-		return null;
-	}
+        return null;
+    }
 
 	toJson(): string {
 		return JSON.stringify(this.serialize());
@@ -51,7 +53,7 @@ export class INode {
 }
 
 export class UnloadedFile extends INode {
-	uuid: string;
+    uuid: string;
 
 	constructor(name: string, uuid: string) {
 		super(name);
@@ -68,22 +70,22 @@ export class UnloadedFile extends INode {
 }
 
 export class File extends INode {
-	uuid: string;
-	data: string;
+    uuid: string;
+    data: string;
 
-	constructor(name: string, uuid: string, data: string) {
-		super(name);
-		this.uuid = uuid;
-		this.data = data;
-	}
+    constructor(name: string, uuid: string, data: string) {
+        super(name);
+        this.uuid = uuid;
+        this.data = data;
+    }
 
-	serialize(): Record<string, any> {
-		return {
-			type: 'file',
-			name: this.name,
-			uuid: this.uuid
-		};
-	}
+    serialize(): Record<string, any> {
+        return {
+            type: "file",
+            name: this.name,
+            uuid: this.uuid,
+        }
+    }
 }
 
 export class Directory extends INode {
