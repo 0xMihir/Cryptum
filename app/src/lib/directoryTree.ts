@@ -52,7 +52,7 @@ export class INode {
 
 export class File extends INode {
 	uuid: string;
-	data: string | null = null;
+	data: Uint8Array | null = null;
 
 	constructor(name: string, uuid: string) {
 		super(name);
@@ -82,6 +82,10 @@ export class Directory extends INode {
 
 	childrenArray(): Array<INode> {
 		return Object.values(this.children);
+	}
+
+	hasFile(name: string): boolean {
+		return this.children[name] !== undefined;
 	}
 
 	serialize(): Record<string, any> {
