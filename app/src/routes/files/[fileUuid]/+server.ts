@@ -8,7 +8,6 @@ import { STORAGE_DIR } from "../../../lib/server/config";
 // retrieves file with the given uuid
 export async function GET(request: RequestEvent): Promise<Response> {
     const fileUuid = request.params.fileUuid ?? "";
-    console.log(fileUuid);
 
     // TODO: check if user owns this file
     
