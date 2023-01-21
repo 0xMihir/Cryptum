@@ -45,7 +45,7 @@ int main(void)
 	crypto_ed25519_public_key(pubkey, (const uint8_t *)local_cdi);
 
 	for (;;) {
-		in = readbyte_ledflash(LED_BLUE, 1000000);
+		in = readbyte_ledflash(LED_BLUE + LED_RED, 1000000);
 
 		if (parseframe(in, &hdr) == -1) { // Invalid frame
 			continue;
@@ -61,6 +61,7 @@ int main(void)
 
 		switch (cmd[0]) {
 		case APP_CMD_GET_PUBKEY:
+			memcpy(rsp, pubkey, 32);
 			appreply(hdr, APP_RSP_GET_PUBKEY, pubkey);
 			break;
 		default: // Unknown command
