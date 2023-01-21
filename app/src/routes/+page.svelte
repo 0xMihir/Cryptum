@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Login from '../lib/Login.svelte';
-	import ContextMenu from '../lib/ContextMenu.svelte';
 
 	onMount(() => {
 		console.log('Hello from SvelteKit');
@@ -19,7 +18,6 @@
 		> to learn more
 	</p>
 </footer>
-<ContextMenu />
 
 <style>
 	footer {
