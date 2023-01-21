@@ -31,6 +31,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"pg": "^8.8.0",
 		"@types/w3c-web-serial": "^1.0.3",
 		"blakejs": "^1.2.1",
 		"bootstrap": "^5.2.3",

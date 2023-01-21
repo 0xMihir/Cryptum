@@ -23,25 +23,23 @@ export class INode {
 			} else if (type == 'directory' && children != null) {
 				const newDirectory = new Directory(name);
 
-                for (const data in Object.values(children)) {
-                    newDirectory.addChild(parseInode(data as any));
-                }
-                
-                return newDirectory;
-            } else {
-                throw {};
-            }
-        }
+				for (const data in Object.values(children)) {
+					newDirectory.addChild(parseInode(data as any));
+				}
 
-        try {
-            const jsonData = JSON.parse(json);
-            if (jsonData["type"])
+				return newDirectory;
+			} else {
+				throw {};
+			}
+		}
 
-            return parseInode(jsonData);
-        } catch (e) {}
+		try {
+			const jsonData = JSON.parse(json);
+			if (jsonData['type']) return parseInode(jsonData);
+		} catch (e) {}
 
-        return null;
-    }
+		return null;
+	}
 
 	toJson(): string {
 		return JSON.stringify(this.serialize());
