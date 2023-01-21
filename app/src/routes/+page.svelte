@@ -1,10 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Login from '../lib/Login.svelte';
-
-	onMount(() => {
-		console.log('Hello from SvelteKit');
-	});
 </script>
 
 <h1>Cryptum</h1>
