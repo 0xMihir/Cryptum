@@ -7,11 +7,13 @@
 
     let directoryStack = [rootDirectory];
 
+    export function currentDirectory(): Directory {
+        return directoryStack[directoryStack.length - 1];
+    }
+
     // returns true if file is added, meaning there are no files with the same name
     export function addFile(file: INode): boolean {
-        const currentDirectory = directoryStack[directoryStack.length - 1];
-
-        if (currentDirectory.hasFile(file.name)) {
+        if (currentDirectory().hasFile(file.name)) {
             return false;
         } else {
             directoryStack[directoryStack.length - 1].addChild(file);
