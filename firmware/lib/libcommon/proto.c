@@ -20,12 +20,14 @@ uint8_t genhdr(uint8_t id, uint8_t endpoint, uint8_t status, enum cmdlen len)
 
 int parseframe(uint8_t b, struct frame_header *hdr)
 {
-	if ((b & 0x80) != 0) {
+	if ((b & 0x80) != 0)
+	{
 		// Bad version
 		return -1;
 	}
 
-	if ((b & 0x4) != 0) {
+	if ((b & 0x4) != 0)
+	{
 		// Must be 0
 		return -1;
 	}
@@ -34,7 +36,8 @@ int parseframe(uint8_t b, struct frame_header *hdr)
 	hdr->endpoint = (b & 0x18) >> 3;
 
 	// Length
-	switch (b & 0x3) {
+	switch (b & 0x3)
+	{
 	case LEN_1:
 		hdr->len = 1;
 		break;
@@ -57,8 +60,10 @@ int parseframe(uint8_t b, struct frame_header *hdr)
 
 void writebyte(uint8_t b)
 {
-	for (;;) {
-		if (*can_tx) {
+	for (;;)
+	{
+		if (*can_tx)
+		{
 			*tx = b;
 			return;
 		}
@@ -69,15 +74,18 @@ void write(uint8_t *buf, size_t nbytes)
 {
 	qemu_puts("Sending: \n");
 	qemu_hexdump(buf, nbytes);
-	for (int i = 0; i < nbytes; i++) {
+	for (int i = 0; i < nbytes; i++)
+	{
 		writebyte(buf[i]);
 	}
 }
 
 uint8_t readbyte()
 {
-	for (;;) {
-		if (*can_rx) {
+	for (;;)
+	{
+		if (*can_rx)
+		{
 			return *rx;
 		}
 	}
@@ -86,10 +94,13 @@ uint8_t readbyte()
 uint8_t readbyte_ledflash(int ledvalue, int loopcount)
 {
 	int led_on = 0;
-	for (;;) {
+	for (;;)
+	{
 		*led = led_on ? ledvalue : 0;
-		for (int i = 0; i < loopcount; i++) {
-			if (*can_rx) {
+		for (int i = 0; i < loopcount; i++)
+		{
+			if (*can_rx)
+			{
 				return *rx;
 			}
 		}
@@ -97,9 +108,27 @@ uint8_t readbyte_ledflash(int ledvalue, int loopcount)
 	}
 }
 
+uint8_t cmdlen_to_bytes(enum cmdlen len)
+{
+	switch (len)
+	{
+	case LEN_1:
+		return 1;
+	case LEN_4:
+		return 4;
+	case LEN_32:
+		return 32;
+	case LEN_128:
+		return 128;
+	default:
+		return 0;
+	}
+}
+
 void read(uint8_t *buf, size_t nbytes)
 {
-	for (int n = 0; n < nbytes; n++) {
+	for (int n = 0; n < nbytes; n++)
+	{
 		buf[n] = readbyte();
 	}
 }

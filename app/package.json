@@ -17,6 +17,7 @@
 		"@types/pg": "^8.6.6",
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
 		"@typescript-eslint/parser": "^5.45.0",
+		"@vitejs/plugin-basic-ssl": "^1.0.1",
 		"eslint": "^8.28.0",
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-plugin-svelte3": "^4.0.0",
@@ -30,6 +31,8 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@types/w3c-web-serial": "^1.0.3",
+		"blakejs": "^1.2.1",
 		"bootstrap": "^5.2.3",
 		"sequelize": "^6.28.0",
 		"sequelize-cockroachdb": "^6.0.5",
