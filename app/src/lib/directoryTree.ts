@@ -23,7 +23,7 @@ export class INode {
 			} else if (type == 'directory' && children != null) {
 				const newDirectory = new Directory(name);
 
-				for (const data in Object.values(children)) {
+				for (const data of Object.values(children)) {
 					newDirectory.addChild(parseInode(data as any));
 				}
 
@@ -35,10 +35,10 @@ export class INode {
 
 		try {
 			const jsonData = JSON.parse(json);
-			if (jsonData['type']) return parseInode(jsonData);
-		} catch (e) {}
-
-		return null;
+			return parseInode(jsonData)
+		} catch (e) {
+            return null;
+        }
 	}
 
 	toJson(): string {
