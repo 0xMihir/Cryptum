@@ -1,8 +1,4 @@
 <script lang="ts">
-<<<<<<< HEAD
-	import FileView from '$lib/FileView.svelte';
-</script>
-=======
 	import { Directory, INode } from "$lib/directoryTree";
 	import DirectoryView from "$lib/DirectoryView.svelte";
 
@@ -25,4 +21,3 @@
 </script>
 
 <DirectoryView directory={root}/>
->>>>>>> 319e42ce491b77633249603ef695d462aca38ac3
