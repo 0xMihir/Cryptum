@@ -19,7 +19,7 @@ export class INode {
 			const children = fileData['children'];
 
 			if (type == 'file' && fileData['uuid'] != null) {
-				return new UnloadedFile(name, fileData['uuid']);
+				return new File(name, fileData['uuid']);
 			} else if (type == 'directory' && children != null) {
 				const newDirectory = new Directory(name);
 
@@ -50,31 +50,13 @@ export class INode {
 	}
 }
 
-export class UnloadedFile extends INode {
+export class File extends INode {
 	uuid: string;
+	data: string | null = null;
 
 	constructor(name: string, uuid: string) {
 		super(name);
 		this.uuid = uuid;
-	}
-
-	serialize(): Record<string, any> {
-		return {
-			type: 'file',
-			name: this.name,
-			uuid: this.uuid
-		};
-	}
-}
-
-export class File extends INode {
-	uuid: string;
-	data: string;
-
-	constructor(name: string, uuid: string, data: string) {
-		super(name);
-		this.uuid = uuid;
-		this.data = data;
 	}
 
 	serialize(): Record<string, any> {
