@@ -1,7 +1,8 @@
 <script lang="ts">
     export let name: string;
+    export let selected: boolean;
 </script>
 
-<div>
-    <h3>{name}</h3>
+<div on:click>
+    <p>{name}</p>
 </div>
