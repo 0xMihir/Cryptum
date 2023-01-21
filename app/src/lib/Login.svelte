@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 
     import tk from '$lib/TKey';
+	import "@fontsource/roboto";
 
 	async function doesUserExist(uuid: string) {
 		const response = await fetch('/api/checkpub', {
@@ -102,3 +103,19 @@
 </script>
 
 <button on:click={login}>Login</button>
+
+
+<style>
+	button {
+		background-image: linear-gradient(to left, #FF0790, #2300FF); /* Green */
+		border: none;
+		font-family: 'Roboto', sans-serif;
+		color: white;
+		padding: 20px 32px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		border-radius: 30px;
+		font-size: 16px;
+	}
+</style>
