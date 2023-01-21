@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Directory, INode } from "$lib/directoryTree";
-	import DirectoryView from "$lib/DirectoryView.svelte";
+	import DriveSideBar from "$lib/DriveSideBar.svelte";
+	import FileManager from "$lib/FileManager.svelte";
 
     const root = INode.fromJson(`{
         "type": "directory",
@@ -21,6 +22,12 @@
                         "uuid": "86"
                     },
                     {
+                        "type": "directory",
+                        "name": "time",
+                        "children": [
+                        ]
+                    },
+                    {
                         "type": "file",
                         "name": "kanye west.txt",
                         "uuid": "23"
@@ -36,4 +43,14 @@
     }`) as Directory;
 </script>
 
-<DirectoryView directory={root}/>
+<DriveSideBar/>
+
+<div class="file-manager">
+    <FileManager rootDirectory={root}/>
+</div>
+
+<style>
+    .file-manager {
+        margin-left: 250px;
+    }
+</style>

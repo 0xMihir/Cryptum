@@ -18,7 +18,7 @@
     }
 </script>
 
-<div>
+<div class="d-flex flex-row flex-wrap">
     {#each directory.childrenArray().filter(child => child instanceof Directory) as child (child.name)}
         <FileIcon icon="folder-blue.svg" name={child.name} selected={child.name == selectedFileName} on:click={() => fileClicked(child)}/>
     {/each}
