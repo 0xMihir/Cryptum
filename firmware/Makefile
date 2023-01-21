@@ -18,7 +18,7 @@ LDFLAGS=-T app.lds -L lib/libcommon/ -lcommon -L lib/libcrt0/ -lcrt0
 RM=/bin/rm
 
 .PHONY: all
-all: app.bin
+all: app.bin copy
 
 # C runtime library
 lib/libcrt0/libcrt0.a: lib/libcrt0/crt0.o
@@ -57,6 +57,9 @@ clean:
 	$(RM) -f $(LIBS) $(LIBOBJS) lib/libcrt0/crt0.o
 	$(RM) -f include/monocypher/libmonocypher.a $(MONOOBJS)
 
+.PHONY: copy
+copy: app.bin
+	cp -f app.bin ../app/static/app.bin
 
 FMTFILES=*.[ch]
 .PHONY: fmt

@@ -39,6 +39,7 @@ void writebyte(uint8_t b);
 void write(uint8_t *buf, size_t nbytes);
 uint8_t readbyte();
 uint8_t readbyte_ledflash(int ledvalue, int loopcount);
+uint8_t cmdlen_to_bytes(enum cmdlen len);
 void read(uint8_t *buf, size_t nbytes);
 
 #endif
