@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Directory, INode } from "$lib/directoryTree";
+	import DriveSideBar from "$lib/DriveSideBar.svelte";
 	import FileManager from "$lib/FileManager.svelte";
 
     const root = INode.fromJson(`{
@@ -42,4 +43,14 @@
     }`) as Directory;
 </script>
 
-<FileManager rootDirectory={root}/>
+<DriveSideBar/>
+
+<div class="file-manager">
+    <FileManager rootDirectory={root}/>
+</div>
+
+<style>
+    .file-manager {
+        margin-left: 250px;
+    }
+</style>

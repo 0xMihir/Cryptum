@@ -40,6 +40,9 @@
 
 <style>
     .top-bar {
+        overflow: hidden;
+        background-color: #c5c5c5;
+        width: 100%;
         padding-left: 2rem;
         padding-right: 2rem;
         padding-top: 1rem;
