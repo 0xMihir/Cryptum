@@ -57,6 +57,11 @@ const loadApp = (size: number, userSecret: string) : Uint8Array => {
 	return buffer;
 }
 
+// const loadAppData = (data: Uint8Array) : Uint8Array => {
+// 	const buffer = makeBuffer(commands.firmwareCommands.cmdLoadAppData, 2);
+
+
+
 class TkeyConnection {
 	private port: SerialPort;
 	private reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
@@ -131,9 +136,6 @@ class TkeyConnection {
 		return buffer;
 	}
 
-	public async loadAppChunk(chunk: Uint8Array) {
-		const buffer = makeBuffer(commands.firmwareCommands.cmdLoadAppData, 2);
-
 	public setReadTimeout(timeout: number): void {
 		this.readTimeout = timeout;
 	}
@@ -145,6 +147,7 @@ class TkeyConnection {
 
 export default {
 	makeBuffer,
+	loadApp,
 	commands,
 	TkeyConnection
 };
