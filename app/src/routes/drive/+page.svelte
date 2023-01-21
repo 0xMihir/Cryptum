@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Directory, INode } from "$lib/directoryTree";
-	import DirectoryView from "$lib/DirectoryView.svelte";
+	import FileManager from "$lib/FileManager.svelte";
 
     const root = INode.fromJson(`{
         "type": "directory",
@@ -21,6 +21,12 @@
                         "uuid": "86"
                     },
                     {
+                        "type": "directory",
+                        "name": "time",
+                        "children": [
+                        ]
+                    },
+                    {
                         "type": "file",
                         "name": "kanye west.txt",
                         "uuid": "23"
@@ -36,4 +42,4 @@
     }`) as Directory;
 </script>
 
-<DirectoryView directory={root}/>
+<FileManager rootDirectory={root}/>
