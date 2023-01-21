@@ -3,6 +3,6 @@
     export let selected: boolean;
 </script>
 
-<div on:click>
+<div on:click class:text-bg-primary={selected}>
     <p>{name}</p>
 </div>
