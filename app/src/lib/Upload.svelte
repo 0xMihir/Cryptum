@@ -25,11 +25,11 @@
 	}
 
 	async function fileUpload(contents: string | ArrayBuffer | null | undefined) {
-		const res = await fetch('http://localhost:5173/files', {
+		const res = await fetch('/localhost:5173/files', {
 			method: 'POST',
 			body: contents
 		});
-		console.log(contents);
+		console.log(res);
 	}
 </script>
 

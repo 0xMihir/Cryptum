@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Login from '../lib/Login.svelte';
+	import Upload from '../lib/Upload.svelte'
 
 	onMount(() => {
 		console.log('Hello from SvelteKit');
@@ -18,6 +19,7 @@
 		> to learn more
 	</p>
 </footer>
+<Upload/>
 
 <style>
 	footer {

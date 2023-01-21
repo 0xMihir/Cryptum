@@ -31,10 +31,11 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"pg": "^8.8.0",
+		"@google-cloud/storage": "^6.9.0",
 		"@types/w3c-web-serial": "^1.0.3",
 		"blakejs": "^1.2.1",
 		"bootstrap": "^5.2.3",
+		"pg": "^8.8.0",
 		"sequelize": "^6.28.0",
 		"sequelize-cockroachdb": "^6.0.5",
 		"sveltestrap": "^5.10.0"
