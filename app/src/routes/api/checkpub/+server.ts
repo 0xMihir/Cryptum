@@ -1,13 +1,12 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
-import { Client } from 'pg';
+import Client from 'pg';
 import { DATABASE_URL } from '$env/static/private';
 
 export const POST = (async (request) => {
 	const DATABASEURL = DATABASE_URL;
-
-	const client = new Client(DATABASEURL); //process.env.DATABASE_URL
+	const client = new Client.Client(DATABASEURL); //process.env.DATABASE_URL
 	try {
 		await client.connect();
 		await client.query(
@@ -17,7 +16,7 @@ export const POST = (async (request) => {
 		throw error(500, 'Could not connect to database');
 	}
 	const data = await request.request.json();
-	console.log("a");
+	console.log('a');
 	console.log(data.pubKey);
 	const query = {
 		// give the query a unique name

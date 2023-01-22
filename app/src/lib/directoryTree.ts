@@ -101,6 +101,16 @@ export class Directory extends INode {
 		}
 	}
 
+	removeChildInode(inode: INode): boolean {
+		if (inode.parent === this) {
+			this.removeChild(inode.name);
+			inode.parent = null;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	childrenArray(): Array<INode> {
 		return Object.values(this.children);
 	}

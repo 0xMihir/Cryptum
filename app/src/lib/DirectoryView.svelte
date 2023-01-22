@@ -39,7 +39,7 @@
 </script>
 
 {#if showMenu}
-    <ContextMenu x={pos.x} y={pos.y} {node} currentDirectory={directory} on:closemenu={() => showMenu = false} on:foldersUpdated/>
+    <ContextMenu x={pos.x} y={pos.y} {node} currentDirectory={directory} on:closemenu={() => { console.log("close"); showMenu = false}} on:foldersUpdated/>
 {/if}
 
 <div class="d-flex flex-row flex-wrap">

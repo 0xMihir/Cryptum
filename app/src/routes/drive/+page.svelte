@@ -8,7 +8,6 @@
     import ErrorPopup from "$lib/ErrorPopup.svelte";
 	import { onMount } from "svelte";
     import { connection } from "$lib/stores/connection";
-    import TKey from "$lib/TKey";
 
 
     // temp until server loads
@@ -23,12 +22,15 @@
             const res = await fetch("/files/root", {
                 method: "GET",
             });
-            const data = new Uint8Array(await res.arrayBuffer())
-            if (data == null) {
-                errorPopup.showError("could not retrieve files from server");
-                return;
-            }           
 
+            let inode;
+
+            if (res.ok) {
+                const data = new Uint8Array(await res.arrayBuffer());
+                inode = INode.fromJson(new TextDecoder().decode(data));
+            } else {
+                inode = new Directory("root");
+            }
             const conn = $connection;
 
             let decryptedBuffer = new Uint8Array(129);
@@ -42,8 +44,6 @@
                 decryptedBuffer = temp;  
             }
 
-
-            const inode = INode.fromJson(new TextDecoder().decode(data));
             if (inode != null && inode instanceof Directory) {
                 fileManager.setRootDirectory(inode);
                 root = inode;
@@ -88,8 +88,8 @@
                 headers: {"content-type": "application/octet-stream"}
             });
 
-            const body = (await res?.body?.getReader()?.read())?.value;
-            if (res.ok && res.body != null) {
+            if (res.ok) {
+                const body = new Uint8Array(await res.arrayBuffer());
                 const file = new File(newFile.name, new TextDecoder().decode(body));
                 fileManager.addFile(file);
             } else {
