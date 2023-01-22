@@ -2,10 +2,6 @@
 	import { onMount } from 'svelte';
 	import Login from '../lib/Login.svelte';
 	import "@fontsource/roboto";
-
-	onMount(() => {
-		console.log('Hello from SvelteKit');
-	});
 </script>
 <video id="background-video"
 	src="../static/videos/landing-page-bg.mp4"

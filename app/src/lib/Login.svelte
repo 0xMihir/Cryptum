@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { redirect } from '@sveltejs/kit';
+
     import tk from '$lib/TKey';
 	import "@fontsource/roboto";
-	const commands = tk.commands;
 
-	async function doesUserExist(uuid: String) {
+	async function doesUserExist(uuid: string) {
 		const response = await fetch('/api/checkpub', {
 			method: 'POST',
 			body: JSON.stringify({ uuid }),
@@ -33,7 +32,7 @@
 		}
 	}
 
-	async function getname(uuid: String) {
+	async function getname(uuid: string) {
 		const response = await fetch('/api/getname', {
 			method: 'POST',
 			body: JSON.stringify({ uuid }),
@@ -54,11 +53,31 @@
 	//         console.log(data);
 	//     });
 	const login = async () => {
+		let port = await navigator.serial.requestPort({
+			filters: [{ usbVendorId: 4615, usbProductId: 34951 }]
+		});
+		const appBin = await fetch('/app.bin');
+		const blob = await appBin.blob();
+
+		const appBuffer = new Uint8Array(await blob.arrayBuffer());
+		
+		const conn = await tk.TkeyConnection.connect(port);
+
+		const successfulLoad = await conn.loadBinary(appBuffer);		
+
+		if (!successfulLoad) {
+			console.log('Failed to load binary');
+			return;
+		} else {
+			console.log('Loaded binary');
+		}
+
+
         const str = await getstr(); // random string
 		const uuid = 'sample_pubkey' // TODO: get pubkey from tkey
 		const data = await doesUserExist(uuid);
 		const name = await getname(uuid);
-		console.log();
+
 		if (data["exists"]) {
 			setCookie('uuid', uuid);
 			setCookie('name',name["results"][0]["name"]);
@@ -67,21 +86,6 @@
 			setCookie('uuid', uuid);
 			return await goto('/create');
 		}
-        
-		let port = await navigator.serial.requestPort({
-			filters: [{ usbVendorId: 4615, usbProductId: 34951 }]
-		});
-
-		const response = await fetch('/app.bin');
-		const blob = await response.blob();
-		const cmd = tk.makeBuffer(commands.firmwareCommands.cmdGetNameVersion, 2);
-		const conn = await tk.TkeyConnection.connect(port);
-
-		await conn.writeFrame(cmd);
-		const resp = await conn.readFrame(commands.firmwareCommands.rspGetNameVersion, 2);
-		console.log(resp);
-
-        
 	};
 	/*
 	* General utils for managing cookies in Typescript.
