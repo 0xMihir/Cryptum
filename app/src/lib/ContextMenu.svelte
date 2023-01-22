@@ -114,7 +114,6 @@
 	}
 </script>
 
-<!--TODO: Handle if it's a directory instead-->
 <div class="menu" style={menuStyle} >
 	<div class="option-container">
 		<button on:click={renameNode} class="option">Rename File</button>
