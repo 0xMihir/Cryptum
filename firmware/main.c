@@ -31,7 +31,7 @@ const uint32_t app_version = 0x00000001;
 #define MAX_SIGN_SIZE 4096
 #define MAC_SIZE 16
 #define NONCE_SIZE 24
-#define MESSAGE_SIZE 127 - MAC_SIZE - NONCE_SIZE
+#define MESSAGE_SIZE 126 - MAC_SIZE - NONCE_SIZE
 
 void get_random(uint8_t *buf, int bytes)
 {
