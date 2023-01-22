@@ -17,6 +17,8 @@ export const POST = (async (request) => {
 		throw error(500, 'Could not connect to database');
 	}
 	const data = await request.request.json();
+	console.log("a");
+	console.log(data.pubKey);
 	const query = {
 		// give the query a unique name
 		name: 'check-exists',

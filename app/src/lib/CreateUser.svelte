@@ -1,16 +1,21 @@
 <script lang='ts'>
 	import { goto } from "$app/navigation";
 	import { error, redirect } from "@sveltejs/kit";
+    import {onMount } from 'svelte';
 
     let username = '';
+    var pubKey = '';
     // const pubKey:any = getCookie('pubKey'); //pubkey
-    const pubKey = 'cygnusx26';
+    onMount(() => {
+        //@ts-ignore
+        pubKey = JSON.parse(window.atob(getCookie('token').split('.')[1]))["pubKey"];
+    });
     //validate the public key somehow
-
     if (!pubKey) {
         error(500, 'No valid public key found');
     }
-    const createUser = () =>
+    const createUser = () => {
+        console.log(pubKey);
         fetch('/api/insertuser', {
             method: 'POST', 
             headers: {
@@ -21,7 +26,7 @@
         .then((res) => res.json())
         .then(async (data) => {
             if (data.success) {
-                setCookie('username', username);
+                setCookie('name', username);
                 goto('/drive'); //TODO: add user param
             } else {
                 error(500, 'User creation failed');
@@ -30,7 +35,7 @@
         .catch((err) => {
             console.log(err);
         });
-
+}
     function setCookie(name: string, val: string) {
 		const date = new Date();
 		const value = val;
@@ -41,6 +46,15 @@
 		// Set it
 		document.cookie = name+"="+value+"; expires="+date.toUTCString()+"; path=/";
 	}
+    function getCookie(name: string) {
+        const value = "; " + document.cookie;
+        const parts = value.split("; " + name + "=");
+        
+        if (parts.length == 2) {
+            //@ts-ignore
+            return parts.pop().split(";").shift();
+        }
+}
 </script>
     <input class= "input" type="text" bind:value={username} />
 <div class="create-button-container">

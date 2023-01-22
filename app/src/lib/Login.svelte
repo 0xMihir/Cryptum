@@ -92,6 +92,15 @@
 
 		const data = await doesUserExist(pubKey);
 		const name = await getName(pubKey);
+		if (data["exists"]){
+			setCookie('name', name);
+			goto('/drive')
+		} else {
+			goto('/create')
+		}
+		
+		console.log(data);
+		console.log(name);
 	};
 	/*
 	* General utils for managing cookies in Typescript.

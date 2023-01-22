@@ -18,7 +18,7 @@ export const POST = (async ({ request, cookies }) => {
 			'token',
 			jwt.sign(
 				{
-					pubKey: data.pubKey
+					pubKey: data.pubKey,
 				},
 				TOKEN_KEY,
 				{
@@ -29,8 +29,8 @@ export const POST = (async ({ request, cookies }) => {
 				maxAge: 60 * 60 * 24 * 7,
 				path: '/',
 				sameSite: 'lax',
-				httpOnly: true,
-				secure: true
+				httpOnly: false,
+
 			}
 		);
 	} else {
