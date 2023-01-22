@@ -68,7 +68,29 @@
 		}
 	}
 </script>
+<body>
+    <input type="text" bind:value={username} />
+    <button on:click={createUser}>Create User</button>
+</body>
 
-<input type="text" bind:value={username} />
 
-<button on:click={createUser}>Create User</button>
+
+<style>
+    body {
+	background: linear-gradient(-45deg, #2300FF, #000, #FF0790);
+	background-size: 400% 400%;
+	animation: gradient 7s ease infinite;
+}
+
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+</style>

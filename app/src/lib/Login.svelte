@@ -55,7 +55,7 @@
 	//     });
 	const login = async () => {
         const str = await getstr(); // random string
-		const uuid = 'sample_pubkey' // TODO: get pubkey from tkey
+		const uuid = 'pubkey2' // TODO: get pubkey from tkey
 		const data = await doesUserExist(uuid);
 		const name = await getname(uuid);
 		console.log();
@@ -109,9 +109,10 @@
 		color: white;
 		padding: 20px 32px;
 		text-align: center;
+
 		text-decoration: none;
 		display: inline-block;
 		border-radius: 30px;
-		font-size: 16px;
+		font-size: 30px;
 	}
 </style>
