@@ -7,6 +7,7 @@
 	import Confirmation from "$lib/confirm/Confirmation.svelte";
     import ErrorPopup from "$lib/ErrorPopup.svelte";
 	import { onMount } from "svelte";
+    import { connection } from "$lib/stores/connection";
 
     /*const root = INode.fromJson(`{
         "type": "directory",
@@ -64,6 +65,9 @@
                 errorPopup.showError("could not retrieve files from server");
                 return;
             }
+
+            
+
 
             const inode = INode.fromJson(new TextDecoder().decode(data));
             if (inode != null && inode instanceof Directory) {
