@@ -10,12 +10,15 @@
 	>
 	<track kind="captions">
 </video>
-<h1>Cryptum</h1>
 
-<h2>Encrypted file storage powered by the Tillitis TKey</h2>
+<div class="center">
+	<div class="items">
+		<h1>Cryptum</h1>
 
-<div class="login-button">
-	<Login />
+		<h2>Encrypted file storage powered by the Tillitis TKey</h2>
+
+		<Login />
+	</div>
 </div>
 
 
@@ -43,6 +46,18 @@
 		background-clip: text;
 		-webkit-background-clip: text;
 		display: block;
+	}
+	.center {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 50vh;
+	}
+	.items {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
 
 		#background-video {
