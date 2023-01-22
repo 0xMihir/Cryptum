@@ -37,6 +37,7 @@
 		"@types/w3c-web-serial": "^1.0.3",
 		"blakejs": "^1.2.1",
 		"bootstrap": "^5.2.3",
+		"jsonwebtoken": "^9.0.0",
 		"pg": "^8.8.0",
 		"sequelize": "^6.28.0",
 		"sequelize-cockroachdb": "^6.0.5",
