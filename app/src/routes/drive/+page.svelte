@@ -6,6 +6,7 @@
 	import { ConfirmError, ConfirmOk, newConfirm } from "$lib/confirm/confirm";
 	import Confirmation from "$lib/confirm/Confirmation.svelte";
     import ErrorPopup from "$lib/ErrorPopup.svelte";
+	import { onMount } from "svelte";
 
     /*const root = INode.fromJson(`{
         "type": "directory",
@@ -49,6 +50,11 @@
     // temp until server loads
     let root = new Directory("root");
 
+
+    let fileManager: FileManager;
+
+    let errorPopup: ErrorPopup;
+
     async function getRootFromServer() {
         try {
             const res = await fetch("/files/root");
@@ -69,11 +75,7 @@
         }
     }
 
-    getRootFromServer();
-
-    let fileManager: FileManager;
-
-    let errorPopup: ErrorPopup;
+    onMount(() => getRootFromServer());
 
     // updates the root file on server, returns false on failure
     async function updateRootOnServer(): Promise<boolean> {
