@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { fromHex, toHex } from './TKey/utils';
+	import { goto } from '$app/navigation';
+	import { fromHex, toHex, hexdump } from './TKey/utils';
 	import { connection } from './stores/connection';
     import tk from '$lib/TKey';
 	import "@fontsource/roboto";
