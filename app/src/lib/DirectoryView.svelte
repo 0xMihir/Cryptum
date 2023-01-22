@@ -22,7 +22,9 @@
         }
     }
 
-    async function handleRightClick(e: MouseEvent, childNode: INode, isFil: boolean) {
+    async function handleRightClick(event: any, childNode: INode, isFil: boolean) {
+        // fixe type error
+        let e = event as MouseEvent;
         isFile = isFil;
 
         if (showMenu) {
@@ -37,7 +39,7 @@
 </script>
 
 {#if showMenu}
-    <ContextMenu x={pos.x} y={pos.y} {node} {isFile} on:closemenu={() => showMenu = false}/>
+    <ContextMenu x={pos.x} y={pos.y} {node} currentDirectory={directory} on:closemenu={() => showMenu = false} on:foldersUpdated/>
 {/if}
 
 <div class="d-flex flex-row flex-wrap">

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import { Directory, INode } from './directoryTree';
+	import type { Directory, INode } from './directoryTree';
 	const dispatch = createEventDispatcher();
 
-	export let isFile: boolean;
+	export let currentDirectory: Directory;
 	export let node: INode;
 	export let x: Number;
 	export let y: Number;
@@ -14,10 +14,8 @@
 	}
 
 	async function removeNode() {
-		console.log("file delete");
-		const res = await fetch('http://localhost:5173/files/' +  {
-			method: 'DELETE'
-		});
+		currentDirectory.removeChild(node.name);
+		dispatch("foldersUpdated");
 	}
 </script>
 

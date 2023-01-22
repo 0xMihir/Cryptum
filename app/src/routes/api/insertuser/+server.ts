@@ -22,6 +22,7 @@ export const POST = (async ({ request }) => {
 		text: 'INSERT INTO users (name, pubkey, uuid) VALUES ($1, $2, $3)',
 		values: [data.username, data.pubKey, randomUUID()]
 	};
+	const results = await client.query(query);
 	try {
 		return new Response(JSON.stringify({ success: true }));
 	} catch {

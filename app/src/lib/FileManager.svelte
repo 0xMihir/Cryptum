@@ -1,7 +1,10 @@
 <script lang="ts">
+    import { createEventDispatcher } from 'svelte';
     import { Breadcrumb, BreadcrumbItem } from 'sveltestrap';
 	import { Directory, INode, File } from "./directoryTree";
     import DirectoryView from "./DirectoryView.svelte";
+
+    const dispatcher = createEventDispatcher();
 
     export let rootDirectory: Directory;
 
@@ -46,6 +49,11 @@
         directoryStack.splice(index + 1);
         directoryStack = directoryStack;
     }
+
+    function foldersUpdated() {
+        directoryStack = directoryStack;
+        dispatcher("foldersUpdated");
+    }
 </script>
 
 <div class="top-bar">
@@ -60,7 +68,7 @@
     </Breadcrumb>
 </div>
 
-<DirectoryView directory={directoryStack[directoryStack.length - 1]} on:fileOpened={openFile}/>
+<DirectoryView directory={directoryStack[directoryStack.length - 1]} on:fileOpened={openFile} on:foldersUpdated={foldersUpdated}/>
 
 <style>
     .top-bar {
