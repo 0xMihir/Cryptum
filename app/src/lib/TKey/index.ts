@@ -98,7 +98,7 @@ class TkeyConnection {
 			throw new Error('Command length must be between 0 and 3');
 		if (expectedID > 3) throw new Error('Frame ID must be between 0 and 3');
 		if (!this.reader) throw new Error('Serial port is not readable');
-		const buffer = makeBuffer(expectedCommand, expectedID);
+		let buffer = makeBuffer(expectedCommand, expectedID);
 		let offset = 0;
 
 		const start = Date.now();
@@ -116,6 +116,10 @@ class TkeyConnection {
 				buffer.set(value, offset);
 				offset += value.length;
 			}
+		}
+
+		while (buffer[0] == 0) {
+			buffer = buffer.slice(1);
 		}
 
 		const header = parseHeader(buffer[0]);
