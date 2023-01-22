@@ -16,6 +16,9 @@
         padding: 1rem;
         margin: 1rem;
     }
+    .file-icon:hover {
+        background: #d0d0d0;
+    }
     .file-icon-image {
         width: 6rem;
     }
