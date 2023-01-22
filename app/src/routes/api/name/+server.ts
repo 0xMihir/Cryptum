@@ -3,7 +3,6 @@ import { Client } from 'pg';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import { DATABASE_URL } from '$env/static/private';
-import {randomUUID} from 'crypto';
 
 export const POST = (async ({ request }) => {
 	const DATABASEURL = DATABASE_URL;
@@ -16,13 +15,14 @@ export const POST = (async ({ request }) => {
 	const data = await request.json();
 	const query = {
 		// give the query a unique name
-		name: 'insert-user',
-		text: 'INSERT INTO users (name, pubkey, uuid) VALUES ($1, $2, $3)',
-		values: [data.username, data.pubKey, randomUUID()]
+		name: 'fetch-user',
+		text: 'SELECT * FROM users WHERE pubkey = $1',
+		values: [data.pubKey]
 	};
-	try {
-		return new Response(JSON.stringify({ success: true }));
-	} catch {
-		throw error(500, 'Could not insert user');
+	const results = await (await client.query(query)).rows;
+	if (results.length > 0) {
+		return new Response(JSON.stringify({ exists: true, results: results}));
+	} else {
+		return new Response(JSON.stringify({ exists: false }));
 	}
 }) satisfies RequestHandler;
