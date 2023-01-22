@@ -9,12 +9,12 @@ export async function GET(request: RequestEvent): Promise<Response> {
 	const fileUuid = request.params.fileUuid;
 
 	if (fileUuid == null) {
-		throw error(400, "no file uuid specified");
+		throw error(400, 'no file uuid specified');
 	}
 
-	const data = await getObject(pubKey + ":" + fileUuid);
+	const data = await getObject(pubKey + ':' + fileUuid);
 	if (data == null) {
-		throw error(404, "file does not exist");
+		throw error(404, 'file does not exist');
 	}
 
 	return new Response(data);
@@ -25,10 +25,10 @@ export async function DELETE(request: RequestEvent): Promise<Response> {
 	const fileUuid = request.params.fileUuid;
 
 	if (fileUuid == null) {
-		throw error(400, "no file uuid specified");
+		throw error(400, 'no file uuid specified');
 	}
 
-	deleteObject(pubKey + ":" + fileUuid);
+	deleteObject(pubKey + ':' + fileUuid);
 
 	return new Response('file successfully deleted');
 }
