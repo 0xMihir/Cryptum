@@ -25,16 +25,28 @@
 
 <!--TODO: Handle if it's a directory instead-->
 <div class="menu" style={menuStyle} >
-	<button on:click={moveNode} class="option">Move File</button>
-	<button on:click={removeNode} class="option">Remove File</button>
+	<div class="option-container">
+		<button on:click={moveNode} class="option">Move File</button>
+		<button on:click={removeNode} class="option">Remove File</button>
+	</div>
 </div>
 
 <svelte:window on:click={() => dispatch('closemenu')}/>
 
 <style>
+	.option-container {
+		border: 2px black solid
+	}
+
 	.option {
+		border: none;
 		background-color: white;
 		width: 100%;
 		display: block;
 	}
+
+	.option:hover {
+		background-color: grey;
+	}
+	
 </style>

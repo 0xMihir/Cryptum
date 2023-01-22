@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { fromHex, toHex, hexdump } from './TKey/utils';
+	import { fromHex, toHex } from './TKey/utils';
+	import { connection } from './stores/connection';
     import tk from '$lib/TKey';
 	import "@fontsource/roboto";
 
@@ -62,6 +62,7 @@
 		const appBuffer = new Uint8Array(await blob.arrayBuffer());
 		
 		const conn = await tk.TkeyConnection.connect(port);
+		connection.set(conn);
 
 		const successfulLoad = await conn.loadBinary(appBuffer);		
 
