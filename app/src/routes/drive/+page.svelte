@@ -31,18 +31,6 @@
             } else {
                 inode = new Directory("root");
             }
-            const conn = $connection;
-
-            let decryptedBuffer = new Uint8Array(129);
-
-            for (let i = 0; i < data.length - 127; i+=127) {
-                const decrypted = await conn.decryptData(data.slice(i, i+127));
-                // concat decrypted data
-                const temp = new Uint8Array(decryptedBuffer.length + decrypted.length);
-                temp.set(decryptedBuffer);
-                temp.set(decrypted, decryptedBuffer.length);
-                decryptedBuffer = temp;  
-            }
 
             if (inode != null && inode instanceof Directory) {
                 fileManager.setRootDirectory(inode);

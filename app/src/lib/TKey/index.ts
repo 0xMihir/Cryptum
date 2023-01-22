@@ -251,6 +251,42 @@ class TkeyConnection {
 		return (await this.readFrame(commands.appCommands.rspAEADEncrypt)).slice(3);
 	}
 
+	public async encrypt(input: Uint8Array): Promise<Uint8Array> {
+		let length = input.length + 8;
+		const paddingLength = length % 86;
+		length += paddingLength;
+
+		let data = new Uint8Array(length);
+		const n = input.length;
+		data[0] = n;
+		data[1] = n >> 8;
+		data[2] = n >> 16;
+		data[3] = n >> 24;
+		data[4] = n >> 32;
+		data[5] = n >> 40;
+		data[6] = n >> 48;
+		data[7] = n >> 56;
+
+		data.set(input, 8);
+
+		const endDataIndex = 8 + input.length;
+
+		for (let i = endDataIndex; i < endDataIndex + paddingLength; i++) {
+			data[i] = 0;
+		}
+
+		let encryptOutput = new Uint8Array(data.length);
+
+		let ei = 0;
+		for (let pi = 0; pi < data.length; pi+=86) {
+			const decrypted = await this.decryptData(data.slice(pi, pi+87));
+			encryptOutput.set(decrypted, ei);
+			ei += 127;
+		}
+
+		return encryptOutput;
+	}
+
 	public async decryptData(data: Uint8Array): Promise<Uint8Array> {
 		if (data.byteLength > 127) {
 			throw new Error('Data too long');
@@ -262,6 +298,32 @@ class TkeyConnection {
 		await this.writeFrame(decryptDataCmd);
 
 		return (await this.readFrame(commands.appCommands.rspAEADDecrypt)).slice(2);
+	}
+
+	public async decrypt(data: Uint8Array): Promise<Uint8Array> {
+		if (data.length % 127 != 0) {
+			throw new Error("encrypted data must be a multiple of 127");
+		}
+
+		let decryptOutput = new Uint8Array(data.length);
+
+		let di = 0;
+		for (let ei = 0; ei < data.length - 127; ei+=127) {
+			const decrypted = await this.decryptData(data.slice(ei, ei+127));
+			decryptOutput.set(decrypted, di);
+			di += 86;
+		}
+
+		const length = data[0]
+			| data[1] << 8
+			| data[2] << 16
+			| data[3] << 24
+			| data[4] << 32
+			| data[5] << 40
+			| data[6] << 48
+			| data[7] << 56;
+		
+		return decryptOutput.slice(8, 8 + length);
 	}
 
 
