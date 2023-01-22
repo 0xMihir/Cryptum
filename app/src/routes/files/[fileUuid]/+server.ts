@@ -1,55 +1,28 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { readFile, unlink } from 'fs/promises';
-import { join } from 'path/posix';
-
-import { STORAGE_DIR } from '../../../lib/server/config';
-import { Storage } from '@google-cloud/storage';
+import { deleteObject, getObject } from '$lib/server/googleCloud';
 
 // retrieves file with the given uuid
 export async function GET(request: RequestEvent): Promise<Response> {
-	const fileUuid = request.params.fileUuid ?? '';
+	const fileUuid = request.params.fileUuid;
 
-	// TODO: check if user owns this file
-	const storage = new Storage({
-		projectId: 'cryptum',
-		keyFilename: 'gc_keyfile/cryptum-cc63e7b7ac73.json'
-	});
-
-	const bucket = storage.bucket('cryptum-storage');
-
-	async function streamFile() {
-		// Downloads the file into a buffer in memory.
-		const contents = await bucket.file(fileUuid).download();
-		return contents.toString();
+	if (fileUuid == null) {
+		throw error(400, "no file uuid specified");
 	}
 
-	let data = await streamFile().catch(() => {
-		throw error(500, 'unable to download file');
-	});
-
-	return new Response(data);
+	// TODO: check if user owns this file
+	return new Response(await getObject(fileUuid));
 }
 
 export async function DELETE(request: RequestEvent): Promise<Response> {
-	const fileUuid = request.params.fileUuid ?? '';
+	const fileUuid = request.params.fileUuid;
 
-	// TODO: check if user owns this file
-
-	const storage = new Storage({
-		projectId: 'cryptum',
-		keyFilename: 'gc_keyfile/cryptum-cc63e7b7ac73.json'
-	});
-
-	const bucket = storage.bucket('cryptum-storage');
-
-	async function deleteFile() {
-		await bucket.file(fileUuid).delete();
+	if (fileUuid == null) {
+		throw error(400, "no file uuid specified");
 	}
 
-	await deleteFile().catch(() => {
-		throw error(500, 'unable to delete file');
-	});
+	// TODO: check if user owns this file
+	deleteObject(fileUuid);
 
 	return new Response('file successfully deleted');
 }
