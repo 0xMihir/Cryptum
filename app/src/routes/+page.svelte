@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import Login from '../lib/Login.svelte';
 	import "@fontsource/roboto";
+	import "@fontsource/varela-round";
 </script>
 <video id="background-video"
 	src="../static/videos/landing-page-bg.mp4"
@@ -19,26 +20,24 @@
 
 
 <style>
-	@font-face {
-        font-family: 'VarelaRound-Regular';
-        font-style: normal;
-        font-weight: 400;
-        src: local('VarelaRound-Regular') url('../static/fonts/VarelaRound-Regular.woff') format('woff');
-    }
 	h1 {
 		font-size: 70px;
-		font-family: 'VarelaRound-Regular';
+		font-family: 'Varela Round';
 		font-weight: 200;
 		background: white;
 		color: transparent;
 		background-clip: text;
 		-webkit-background-clip: text;
-		display: block;
+		display: flex;
+		text-align: center;
+		align-items: center;
+		justify-content: center;
 	}
 	h2 {
 		font-size: 25px;
+
 		font-weight: 200;
-		font-family: 'VarelaRound';
+		font-family: 'Varela Round';
 		background-image: linear-gradient(to left, #FF0790, #2300FF);
 		color: transparent;
 		background-clip: text;
