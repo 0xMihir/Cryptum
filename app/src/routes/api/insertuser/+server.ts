@@ -3,10 +3,11 @@ import { Client } from 'pg';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import { DATABASE_URL } from '$env/static/private';
-import {randomUUID} from 'crypto';
+import { randomUUID } from 'crypto';
 
 export const POST = (async ({ request }) => {
 	const DATABASEURL = DATABASE_URL;
+
 	const client = new Client(DATABASEURL); //process.env.DATABASE_URL
 	try {
 		await client.connect();

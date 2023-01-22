@@ -6,10 +6,13 @@ import { DATABASE_URL } from '$env/static/private';
 
 export const POST = (async (request) => {
 	const DATABASEURL = DATABASE_URL;
+
 	const client = new Client(DATABASEURL); //process.env.DATABASE_URL
 	try {
 		await client.connect();
-		await client.query('CREATE TABLE IF NOT EXISTS users (name TEXT NOT NULL UNIQUE, pubkey TEXT NOT NULL UNIQUE, uuid TEXT NOT NULL UNIQUE)');
+		await client.query(
+			'CREATE TABLE IF NOT EXISTS users (name TEXT NOT NULL UNIQUE, pubkey TEXT NOT NULL UNIQUE, uuid TEXT NOT NULL UNIQUE)'
+		);
 	} catch (e) {
 		throw error(500, 'Could not connect to database');
 	}

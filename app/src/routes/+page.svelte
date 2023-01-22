@@ -14,7 +14,7 @@
 <div class="center">
 	<div class="items">
 		<div class="title-container">
-			<img class="logo" src="static/logo.png" alt="logo"/>
+			<img class="logo" src="/logo.png" alt="logo"/>
 			<h1>Cryptum</h1>
 		</div>
 
