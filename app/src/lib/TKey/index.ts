@@ -1,4 +1,4 @@
-import { cmdByteLength, type Command, type CommandEndpoint, type CommandLength } from './commands';
+import { cmdByteLength, CommandStatus, type Command, type CommandEndpoint, type CommandLength } from './commands';
 import commands from './commands';
 import { blake2s } from 'blakejs';
 
@@ -140,7 +140,7 @@ class TkeyConnection {
 
 		await this.writeFrame(loadAppCmd);
 
-		const loadAppResp = await this.readFrame(commands.firmwareCommands.rspLoadApp);
+		await this.readFrame(commands.firmwareCommands.rspLoadApp);
 
 		let offset = 0;
 
@@ -170,7 +170,63 @@ class TkeyConnection {
 			}
 		}
 		return true;
+	}
 
+	public async getPublicKey(): Promise<Uint8Array> {
+		const cmd = makeBuffer(commands.appCommands.cmdGetPublicKey);
+		await this.writeFrame(cmd);
+		const rsp = await this.readFrame(commands.appCommands.rspGetPublicKey);
+		return rsp.slice(2, 2 + 32);
+	}
+
+
+	public async signData(data: Uint8Array): Promise<Uint8Array> {
+		const sizeCmd = makeBuffer(commands.appCommands.cmdSetSize);
+		sizeCmd[2] = data.byteLength;
+		sizeCmd[3] = data.byteLength >> 8;
+		sizeCmd[4] = data.byteLength >> 16;
+		sizeCmd[5] = data.byteLength >> 24;
+
+		await this.writeFrame(sizeCmd);
+
+		const sizeRsp = await this.readFrame(commands.appCommands.rspSetSize);
+
+		if (sizeRsp[2] !== CommandStatus.Success) {
+			throw new Error('Failed to set size');
+		}	
+
+		let offset = 0;
+
+		while (offset + 127 < data.byteLength) {
+			const chunk = data.slice(offset, offset + 127);
+			const cmd = makeBuffer(commands.appCommands.cmdSignData);
+			cmd.set(chunk, 2);
+			await this.writeFrame(cmd);
+			offset += 127;
+			const signDataResp = await this.readFrame(commands.appCommands.rspSignData);
+			if (signDataResp[2] !== CommandStatus.Success) {
+				throw new Error('Failed to sign data');
+			}
+		}
+
+		const lastChunk = data.slice(offset);
+		const lastSignCmd = makeBuffer(commands.appCommands.cmdSignData);
+		lastSignCmd.set(lastChunk, 2);
+		await this.writeFrame(lastSignCmd);
+		const signDataResp = await this.readFrame(commands.appCommands.rspSignData)
+		if (signDataResp[2] !== CommandStatus.Success) {
+			throw new Error('Failed to sign data');
+		}
+
+		const getSigCmd = makeBuffer(commands.appCommands.cmdGetSignature);
+		await this.writeFrame(getSigCmd);
+		const getSigResp = await this.readFrame(commands.appCommands.rspGetSignature);
+		if (getSigResp[2] !== CommandStatus.Success) {
+			throw new Error('Failed to get signature');
+		}
+		console.log(getSigResp);
+
+		return getSigResp.slice(2, 2 + 64);	
 	}
 
 	public async close(): Promise<void> {
@@ -194,50 +250,12 @@ class TkeyConnection {
 	}
 }
 
-const hexdump = (buffer: string | ArrayBuffer | Uint8Array, blockSize?: number) => {
-	//determine the type of variable "buffer", and convert this to "string".
-	if (typeof buffer === 'string') {
-		//console.log("buffer is string");
-		//do nothing
-	} else if (buffer instanceof ArrayBuffer && buffer.byteLength !== undefined) {
-		buffer = String.fromCharCode(...new Uint8Array(buffer));
-	} else if (Array.isArray(buffer)) {
-		//console.log("buffer is Array");
-		buffer = String.fromCharCode(...buffer);
-	} else if (buffer.constructor === Uint8Array) {
-		buffer = String.fromCharCode(...buffer);
-	} else {
-		//console.log("Error: buffer is unknown...");
-		return false;
-	}
 
-	blockSize = blockSize || 16;
-	const lines = [];
-	const hex = '0123456789abcdef';
-	for (let b = 0; b < buffer.length; b += blockSize) {
-		const block = buffer.slice(b, Math.min(b + blockSize, buffer.length));
-		const addr = ('0000' + b.toString(16)).slice(-4);
-		let codes = block
-			.split('')
-			.map(function (ch) {
-				const code = ch.charCodeAt(0);
-				return hex[(0xf0 & code) >> 4] + hex[0x0f & code] + ' ';
-			})
-			.join('');
-		codes += '	'.repeat(blockSize - block.length);
-		let chars = block.replace(/[\u00-\u1F\x20]/g, '.');
-		chars += ' '.repeat(blockSize - block.length);
-		//		lines.push(addr + " " + codes + "  " + chars);				//old code
-		lines.push(codes + '  //' + chars + '	' + addr); //new code
-	}
-	return lines.join('\n');
-};
 
 export default {
 	makeBuffer,
 	loadApp,
 	loadAppData,
-	hexdump,
 	commands,
 	TkeyConnection
 };

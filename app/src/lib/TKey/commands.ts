@@ -5,6 +5,11 @@ export enum CommandLength {
 	CommandLen128 = 3
 }
 
+export enum CommandStatus {
+	Success = 0,
+	Failure = 1,
+}
+
 export const cmdByteLength = (len: CommandLength) => {
 	switch (len) {
 		case CommandLength.CommandLen1:
@@ -23,89 +28,49 @@ export enum CommandEndpoint {
 	App = 3
 }
 
+const makeFirmwareCommand = (commandCode: number, commandLength: CommandLength) => {
+	return {
+		commandCode,
+		commandLength,
+		commandEndpoint: CommandEndpoint.Firmware
+	};
+};
+
+const makeApplicationCommand = (commandCode: number, commandLength: CommandLength) => {
+    return {
+        commandCode,
+        commandLength,
+        commandEndpoint: CommandEndpoint.App
+    };
+};
+
 export interface Command {
 	commandCode: number;
 	commandLength: CommandLength;
 	commandEndpoint: CommandEndpoint;
 }
 
-const cmdGetNameVersion: Command = {
-	commandCode: 0x01,
-	commandLength: CommandLength.CommandLen1,
-	commandEndpoint: CommandEndpoint.Firmware
-};
+const cmdGetNameVersion = makeFirmwareCommand(0x01, CommandLength.CommandLen1);
+const rspGetNameVersion = makeFirmwareCommand(0x02, CommandLength.CommandLen32);
+const cmdLoadApp = makeFirmwareCommand(0x03, CommandLength.CommandLen128);
+const rspLoadApp = makeFirmwareCommand(0x04, CommandLength.CommandLen4);
+const cmdLoadAppData = makeFirmwareCommand(0x05, CommandLength.CommandLen128);
+const rspLoadAppData = makeFirmwareCommand(0x06, CommandLength.CommandLen4);
+const rspLoadAppDataReady = makeFirmwareCommand(0x07, CommandLength.CommandLen128);
+const cmdGetUDI = makeFirmwareCommand(0x08, CommandLength.CommandLen1);
+const rspGetUDI = makeFirmwareCommand(0x09, CommandLength.CommandLen32);
+// App commands
 
-const rspGetNameVersion: Command = {
-	commandCode: 0x02,
-	commandLength: CommandLength.CommandLen32,
-	commandEndpoint: CommandEndpoint.Firmware
-};
-
-const cmdLoadApp: Command = {
-	commandCode: 0x03,
-	commandLength: CommandLength.CommandLen128,
-	commandEndpoint: CommandEndpoint.Firmware
-};
-
-const rspLoadApp: Command = {
-	commandCode: 0x04,
-	commandLength: CommandLength.CommandLen4,
-	commandEndpoint: CommandEndpoint.Firmware
-};
-
-const cmdLoadAppData: Command = {
-	commandCode: 0x05,
-	commandLength: CommandLength.CommandLen128,
-	commandEndpoint: CommandEndpoint.Firmware
-};
-
-const rspLoadAppData: Command = {
-	commandCode: 0x06,
-	commandLength: CommandLength.CommandLen4,
-	commandEndpoint: CommandEndpoint.Firmware
-};
-
-const rspLoadAppDataReady: Command = {
-	commandCode: 0x07,
-	commandLength: CommandLength.CommandLen128,
-	commandEndpoint: CommandEndpoint.Firmware
-};
-
-const cmdGetUDI: Command = {
-	commandCode: 0x08,
-	commandLength: CommandLength.CommandLen1,
-	commandEndpoint: CommandEndpoint.Firmware
-};
-
-const rspGetUDI: Command = {
-	commandCode: 0x09,
-	commandLength: CommandLength.CommandLen32,
-	commandEndpoint: CommandEndpoint.Firmware
-};
-
-const cmdGetPublicKey: Command = {
-	commandCode: 0x03,
-	commandLength: CommandLength.CommandLen1,
-	commandEndpoint: CommandEndpoint.App
-};
-
-const rspGetPublicKey: Command = {
-	commandCode: 0x04,
-	commandLength: CommandLength.CommandLen128,
-	commandEndpoint: CommandEndpoint.App
-};
-
-const cmdSign: Command = {
-	commandCode: 0x05,
-	commandLength: CommandLength.CommandLen128,
-	commandEndpoint: CommandEndpoint.App
-};
-
-const rspSign: Command = {
-	commandCode: 0x06,
-	commandLength: CommandLength.CommandLen4,
-	commandEndpoint: CommandEndpoint.App
-};
+const cmdGetPublicKey = makeApplicationCommand(0x03, CommandLength.CommandLen1);
+const rspGetPublicKey = makeApplicationCommand(0x04, CommandLength.CommandLen128);
+const cmdSetSize = makeApplicationCommand(0x05, CommandLength.CommandLen32);
+const rspSetSize = makeApplicationCommand(0x06, CommandLength.CommandLen1);
+const cmdSignData = makeApplicationCommand(0x07, CommandLength.CommandLen128);
+const rspSignData = makeApplicationCommand(0x08, CommandLength.CommandLen128);
+const cmdGetSignature = makeApplicationCommand(0x09, CommandLength.CommandLen1);
+const rspGetSignature = makeApplicationCommand(0x0a, CommandLength.CommandLen128);
+const cmdAEADEncrypt = makeApplicationCommand(0x0b, CommandLength.CommandLen128);
+const rspAEADEncrypt = makeApplicationCommand(0x0c, CommandLength.CommandLen128);
 
 export default {
 	firmwareCommands: {
@@ -118,5 +83,17 @@ export default {
 		rspLoadAppDataReady,
 		cmdGetUDI,
 		rspGetUDI
+	},
+	appCommands: {
+		cmdGetPublicKey,
+		rspGetPublicKey,
+		cmdSetSize,
+		rspSetSize,
+		cmdSignData,
+		rspSignData,
+		cmdGetSignature,
+		rspGetSignature,
+		cmdAEADEncrypt,
+		rspAEADEncrypt
 	}
 };

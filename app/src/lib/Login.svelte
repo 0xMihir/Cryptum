@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-
+	import { fromHex, toHex, hexdump } from './TKey/utils';
     import tk from '$lib/TKey';
 	import "@fontsource/roboto";
 
@@ -20,8 +20,8 @@
 		}
 	}
 
-	async function getstr() {
-		const response = await fetch('/api/getstr', {
+	async function getNonce() {
+		const response = await fetch('/api/nonce', {
 			method: 'GET'
 		});
 		if (response.ok) {
@@ -32,8 +32,8 @@
 		}
 	}
 
-	async function getname(uuid: string) {
-		const response = await fetch('/api/getname', {
+	async function getName(uuid: string) {
+		const response = await fetch('/api/name', {
 			method: 'POST',
 			body: JSON.stringify({ uuid }),
 			headers: {
@@ -72,18 +72,24 @@
 			console.log('Loaded binary');
 		}
 
+		const publicKey = await conn.getPublicKey();
+		// get hex string
+		const pubKey = toHex(publicKey);
+		console.log(pubKey);
 
-        const str = await getstr(); // random string
-		const uuid = 'sample_pubkey' // TODO: get pubkey from tkey
-		const data = await doesUserExist(uuid);
-		const name = await getname(uuid);
+        const { nonce } = await getNonce(); // random string
+		
+		const signed = await conn.signData(new TextEncoder().encode(nonce));
+		const signature = new TextDecoder().decode(signed);
+		const data = await doesUserExist(pubKey);
+		const name = await getName(pubKey);
 
 		if (data["exists"]) {
-			setCookie('uuid', uuid);
+			setCookie('uuid', pubKey);
 			setCookie('name',name["results"][0]["name"]);
 			return await goto('/drive');
 		} else {
-			setCookie('uuid', uuid);
+			setCookie('uuid', pubKey);
 			return await goto('/create');
 		}
 	};

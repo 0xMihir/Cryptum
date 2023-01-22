@@ -92,6 +92,10 @@ int main(void)
 			continue; // Message meant for another endpoint
 		}
 
+		memset(rsp, 0, CMDLEN_MAXBYTES);
+
+		led_steady = LED_BLACK;
+
 		switch (cmd[0])
 		{
 		case APP_CMD_GET_NAMEVERSION:
@@ -109,24 +113,24 @@ int main(void)
 			break;
 
 		case APP_CMD_SET_SIZE:
-			if (hdr.len != 32)
-			{
+			// Bad length
+			if (hdr.len != 32) {
 				rsp[0] = STATUS_BAD;
 				appreply(hdr, APP_RSP_SET_SIZE, rsp);
 				break;
 			}
 			signature_done = 0;
-
+			// cmd[1..4] contains the size.
 			message_size = cmd[1] + (cmd[2] << 8) + (cmd[3] << 16) +
-						   (cmd[4] << 24);
+				       (cmd[4] << 24);
 
-			if (message_size > MAX_SIGN_SIZE)
-			{
+			if (message_size > MAX_SIGN_SIZE) {
 				rsp[0] = STATUS_BAD;
 				appreply(hdr, APP_RSP_SET_SIZE, rsp);
 				break;
 			}
 
+			// Reset where we load the data
 			left = message_size;
 			msg_idx = 0;
 
@@ -135,23 +139,20 @@ int main(void)
 			led_steady = LED_GREEN;
 			break;
 
-		case APP_CMD_SIGN_DATA:
-		{
+		case APP_CMD_SIGN_DATA: {
 			const uint32_t cmdBytelen = 128;
 
-			if (hdr.len != cmdBytelen || message_size == 0)
-			{
+			// Bad length of this command, or APP_CMD_SET_SIZE has
+			// not been called
+			if (hdr.len != cmdBytelen || message_size == 0) {
 				rsp[0] = STATUS_BAD;
 				appreply(hdr, APP_RSP_SIGN_DATA, rsp);
 				break;
 			}
 
-			if (left > (cmdBytelen - 1))
-			{
+			if (left > (cmdBytelen - 1)) {
 				nbytes = cmdBytelen - 1;
-			}
-			else
-			{
+			} else {
 				nbytes = left;
 			}
 
@@ -159,15 +160,13 @@ int main(void)
 			msg_idx += nbytes;
 			left -= nbytes;
 
-			if (left == 0)
-			{
+			if (left == 0) {
 				wait_touch_ledflash(LED_GREEN, 350000);
-
 				// All loaded, device touched, let's
 				// sign the message
 				crypto_ed25519_sign(signature,
-									(void *)local_cdi, pubkey,
-									sign_message, message_size);
+						    (void *)local_cdi, pubkey,
+						    sign_message, message_size);
 				signature_done = 1;
 				message_size = 0;
 			}
