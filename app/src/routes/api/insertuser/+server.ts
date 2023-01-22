@@ -11,6 +11,7 @@ export const POST = (async ({ request }) => {
 	try {
 		await client.connect();
 	} catch (e) {
+		console.log(e);
 		throw error(500, 'Could not connect to database');
 	}
 	const data = await request.json();

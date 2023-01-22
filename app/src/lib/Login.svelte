@@ -77,9 +77,9 @@
 		const pubKey = toHex(publicKey);
 		console.log(pubKey);
 
-        const { nonce } = await getNonce(); // random string
-		
-		const signed = await conn.signData(new TextEncoder().encode(nonce));
+        const { nonce } = await getNonce(); 
+
+		const signed = await conn.signData(fromHex(nonce));
 		const sig = toHex(signed);
 
 		const response = await fetch('/api/login', {

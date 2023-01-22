@@ -236,7 +236,7 @@ class TkeyConnection {
 		}
 		console.log(getSigResp);
 
-		return getSigResp.slice(2, 2 + 64);	
+		return getSigResp.slice(3, 3 + 64);	
 	}
 
 	public async close(): Promise<void> {
