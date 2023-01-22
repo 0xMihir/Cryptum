@@ -7,7 +7,7 @@
 	import Confirmation from "$lib/confirm/Confirmation.svelte";
     import ErrorPopup from "$lib/ErrorPopup.svelte";
 
-    const root = INode.fromJson(`{
+    /*const root = INode.fromJson(`{
         "type": "directory",
         "name": "root",
         "children": [
@@ -44,11 +44,51 @@
                 "uuid": "uuid2"
             }
         ]
-    }`) as Directory;
+    }`) as Directory;*/
+
+    // temp until server loads
+    let root = new Directory("root");
+
+    async function getRootFromServer() {
+        try {
+            const res = await fetch("/files/root");
+            const data = (await res.body?.getReader()?.read())?.value;
+            if (data == null) {
+                errorPopup.showError("could not retrieve files from server");
+                return;
+            }
+
+            const inode = INode.fromJson(new TextDecoder().decode(data));
+            if (inode != null && inode instanceof Directory) {
+                root = inode;
+            } else {
+                errorPopup.showError("invalid folder structure recieved from server");
+            }
+        } catch (e) {
+            errorPopup.showError("could not retrieve files from server");
+        }
+    }
 
     let fileManager: FileManager;
 
     let errorPopup: ErrorPopup;
+
+    // updates the root file on server, returns false on failure
+    async function updateRootOnServer(): Promise<boolean> {
+        const rootJson = root.toJson();
+        try {
+            const res = await fetch("/files/root", {
+                method: "POST",
+                body: rootJson,
+            });
+            if (!res.ok) {
+                return false;
+            }
+        } catch (e) {
+            return false;
+        }
+        return true;
+    }
 
     async function addFile(newFile: NewFile) {
         if (fileManager.currentDirectory().hasFile(newFile.name)) {
@@ -68,9 +108,16 @@
                 fileManager.addFile(file);
             } else {
                 errorPopup.showError("could not upload file to server");
+                return;
             }
         } catch (e) {
             errorPopup.showError("could not upload file to server");
+            return;
+        }
+
+        if (!await updateRootOnServer()) {
+            fileManager.currentDirectory().removeChild(newFile.name);
+            errorPopup.showError("could not synchronize folder structure with server");
         }
     }
 
@@ -85,6 +132,11 @@
                 const folder = new Directory(folderName);
                 if (!fileManager.addFile(folder)) {
                     return ConfirmError("a file or folder with that name already exists");
+                }
+
+                if (!await updateRootOnServer()) {
+                    fileManager.currentDirectory().removeChild(folder.name);
+                    return ConfirmError("could not synchronize folder structure with server");
                 }
             }
             return ConfirmOk;
