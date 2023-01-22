@@ -103,6 +103,7 @@
         }
 
         try {
+            console.log(newFile.data);
             const res = await fetch('/files', {
                 method: 'POST',
                 body: newFile.data,
