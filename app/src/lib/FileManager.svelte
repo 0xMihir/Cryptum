@@ -5,7 +5,7 @@
 
     export let rootDirectory: Directory;
 
-    let directoryStack = [rootDirectory];
+    $: directoryStack = [rootDirectory];
 
     export function currentDirectory(): Directory {
         return directoryStack[directoryStack.length - 1];

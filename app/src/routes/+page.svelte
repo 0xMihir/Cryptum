@@ -13,7 +13,10 @@
 
 <div class="center">
 	<div class="items">
-		<h1>Cryptum</h1>
+		<div class="title-container">
+			<img class="logo" src="static/logo.png" alt="logo"/>
+			<h1>Cryptum</h1>
+		</div>
 
 		<h2>Encrypted file storage powered by the Tillitis TKey</h2>
 
@@ -23,6 +26,15 @@
 
 
 <style>
+	.title-container {
+		display: flex;
+		text-align: center;
+		align-items: center;
+		justify-content: center;
+	}
+	.logo {
+		display: inline-block;
+	}
 	h1 {
 		font-size: 70px;
 		font-family: 'Varela Round';
@@ -31,10 +43,7 @@
 		color: transparent;
 		background-clip: text;
 		-webkit-background-clip: text;
-		display: flex;
-		text-align: center;
-		align-items: center;
-		justify-content: center;
+		display: inline-block;
 	}
 	h2 {
 		font-size: 25px;

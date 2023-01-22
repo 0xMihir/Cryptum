@@ -85,6 +85,16 @@ export class Directory extends INode {
 		this.children[child.name] = child;
 	}
 
+	removeChild(name: string): INode | null {
+		const child = this.children[name];
+		if (child !== undefined) {
+			delete this.children[name];
+			return child;
+		} else {
+			return null;
+		}
+	}
+
 	childrenArray(): Array<INode> {
 		return Object.values(this.children);
 	}
