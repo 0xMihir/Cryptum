@@ -16,8 +16,8 @@ export const POST = (async ({ request }) => {
 	const query = {
 		// give the query a unique name
 		name: 'fetch-user',
-		text: 'SELECT * FROM users WHERE uuid = $1',
-		values: [result['uuid']]
+		text: 'SELECT * FROM users WHERE pubkey = $1',
+		values: [result['uuid']] // should be pubkey
 	};
 	const results = await (await client.query(query)).rows;
 	if (results.length > 0) {

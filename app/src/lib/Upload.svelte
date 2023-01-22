@@ -20,7 +20,7 @@
 		const file = fileInput.files[0];
 		console.log(file);
 
-		reader.readAsDataURL(file);
+		reader.readAsText(file);
 		reader.onload = (e) => {
 			contents = e.target?.result;
 			if (contents == null || contents == undefined) {

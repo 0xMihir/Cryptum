@@ -26,12 +26,12 @@ export async function POST(request: RequestEvent): Promise<Response> {
 	const blobStream = blob.createWriteStream({
 		resumable: false
 	});
+
 	await blobStream
-		.on('finish', () => {
-			return new Response('file uploaded');
-		})
 		.on('error', () => {
 			throw error(500, 'unable to upload file to cloud');
 		})
 		.end(contents);
+
+	return new Response(uuid);
 }

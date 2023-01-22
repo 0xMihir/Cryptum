@@ -119,9 +119,11 @@
 		color: white;
 		padding: 20px 32px;
 		text-align: center;
+
 		text-decoration: none;
 		display: inline-block;
 		border-radius: 30px;
-		font-size: 16px;
+		font-size: 30px;
+		margin: auto;
 	}
 </style>

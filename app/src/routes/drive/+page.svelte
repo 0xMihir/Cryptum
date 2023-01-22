@@ -56,18 +56,22 @@
             return;
         }
 
-        const res = await fetch('https://localhost:5173/files', {
-			method: 'POST',
-			body: newFile.data,
-		});
+        try {
+            const res = await fetch('/files', {
+                method: 'POST',
+                body: newFile.data,
+            });
 
-		const body = (await res?.body?.getReader()?.read())?.value;
-		if (res.ok && res.body != null) {
-			const file = new File(newFile.name, new TextDecoder().decode(body));
-            fileManager.addFile(file);
-		} else {
-			errorPopup.showError("could not upload file to server");
-		}
+            const body = (await res?.body?.getReader()?.read())?.value;
+            if (res.ok && res.body != null) {
+                const file = new File(newFile.name, new TextDecoder().decode(body));
+                fileManager.addFile(file);
+            } else {
+                errorPopup.showError("could not upload file to server");
+            }
+        } catch (e) {
+            errorPopup.showError("could not upload file to server");
+        }
     }
 
     const createFolderConfirm = newConfirm();
