@@ -29,6 +29,9 @@ const uint8_t app_name1[4] = "tum ";
 const uint32_t app_version = 0x00000001;
 
 #define MAX_SIGN_SIZE 4096
+#define MAC_SIZE 16
+#define NONCE_SIZE 24
+#define MESSAGE_SIZE 127 - MAC_SIZE - NONCE_SIZE
 
 void get_random(uint8_t *buf, int bytes)
 {
@@ -90,8 +93,8 @@ int main(void)
 	uint8_t in;
 	uint32_t local_cdi[8];
 
-	uint8_t mac[16];
-	uint8_t nonce[24];
+	uint8_t mac[MAC_SIZE];
+	uint8_t nonce[NONCE_SIZE];
 
 	wordcpy(local_cdi, (void *)cdi, 8);
 	crypto_ed25519_public_key(pubkey, (const uint8_t *)local_cdi);
@@ -234,15 +237,50 @@ int main(void)
 				appreply(hdr, APP_RSP_AEAD_ENCRYPT, rsp);
 				break;
 			}
-			memset(mac, 0, 16);
-			memset(nonce, 0, 24);
-			get_random(nonce, 24);
+			memset(mac, 0, MAC_SIZE);
+			memset(nonce, 0, NONCE_SIZE);
+			get_random(nonce, NONCE_SIZE);
 
-			crypto_blake2b_general(mac, 16, (const uint8_t *)local_cdi, 32, (const uint8_t *)cmd + 1, 16 * 6 + 13);
-			crypto_lock(mac, rsp + 1, (const uint8_t *)local_cdi, nonce, (const uint8_t *)cmd + 1, 16 * 6 + 13);
+			crypto_blake2b_general(mac, MAC_SIZE, (const uint8_t *)local_cdi, 32,
+								   (const uint8_t *)cmd + 1, MESSAGE_SIZE);
+			crypto_lock(mac, rsp + 1, (const uint8_t *)local_cdi, nonce, (const uint8_t *)cmd + 1, MESSAGE_SIZE);
+			memcpy(rsp + 1 + MESSAGE_SIZE, nonce, NONCE_SIZE);
+			memcpy(rsp + 1 + MESSAGE_SIZE + NONCE_SIZE, mac, MAC_SIZE);
 			rsp[0] = STATUS_OK;
-			memcpy(rsp + 1 + 16 * 6 + 13, mac, 16);
+
 			appreply(hdr, APP_RSP_AEAD_ENCRYPT, rsp);
+			break;
+		}
+		case APP_CMD_AEAD_DECRYPT:
+		{
+			const uint32_t cmdBytelen = 128;
+
+			// Bad length of this command, or APP_CMD_SET_SIZE has
+			// not been called
+			if (hdr.len != cmdBytelen)
+			{
+				rsp[0] = STATUS_BAD;
+				appreply(hdr, APP_RSP_AEAD_DECRYPT, rsp);
+				break;
+			}
+
+			int success = crypto_unlock(rsp + 1,
+										(const uint8_t *)local_cdi,
+										cmd + 1 + MESSAGE_SIZE, // nonce
+										cmd + 1 + MESSAGE_SIZE + NONCE_SIZE, // mac
+										cmd + 1, // ciphertext
+										MESSAGE_SIZE);
+
+			if (success == 0)
+			{
+				rsp[0] = STATUS_OK;
+				appreply(hdr, APP_RSP_AEAD_DECRYPT, rsp);
+			}
+			else
+			{
+				rsp[0] = STATUS_BAD;
+				appreply(hdr, APP_RSP_AEAD_DECRYPT, rsp);
+			}
 		}
 
 		default: // Unknown command

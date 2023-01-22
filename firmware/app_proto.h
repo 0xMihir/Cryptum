@@ -26,6 +26,9 @@ enum appcmd {
     APP_CMD_AEAD_ENCRYPT    = 0x0B,
     APP_RSP_AEAD_ENCRYPT    = 0x0C,
 
+    APP_CMD_AEAD_DECRYPT    = 0x0D,
+    APP_RSP_AEAD_DECRYPT    = 0x0E,
+
 	APP_RSP_UNKNOWN_CMD     = 0xFF,
 };
 // clang-format on
