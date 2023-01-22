@@ -9,6 +9,7 @@
 	import { onMount } from "svelte";
     import { connection } from "$lib/stores/connection";
 
+    const conn = $connection;
 
     // temp until server loads
     let root = new Directory("root");
@@ -26,7 +27,7 @@
             let inode;
 
             if (res.ok) {
-                const data = await $connection.decrypt(new Uint8Array(await res.arrayBuffer()));
+                const data = await conn.decrypt(new Uint8Array(await res.arrayBuffer()));
                 inode = INode.fromJson(new TextDecoder().decode(data));
             } else {
                 inode = new Directory("root");
@@ -39,6 +40,7 @@
                 errorPopup.showError("invalid folder structure recieved from server");
             }
         } catch (e) {
+            console.log(e   );
             errorPopup.showError("could not retrieve files from server");
         }
     }
@@ -52,7 +54,7 @@
         try {
             const res = await fetch("/files/root", {
                 method: "POST",
-                body: await $connection.encrypt(rootJson),
+                body: await conn.encrypt(rootJson),
             });
             if (!res.ok) {
                 return false;
@@ -72,7 +74,7 @@
         try {
             const res = await fetch('/files', {
                 method: 'POST',
-                body: await $connection.encrypt(new Uint8Array(newFile.data)),
+                body: await conn.encrypt(new Uint8Array(newFile.data)),
                 headers: {"content-type": "application/octet-stream"}
             });
 

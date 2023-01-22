@@ -7,6 +7,7 @@
 	import { connection } from './stores/connection';
 
     const dispatcher = createEventDispatcher();
+    const conn = $connection;
 
     export let rootDirectory: Directory;
 
@@ -48,7 +49,7 @@
                 });
 
                 const fileArray = new Uint8Array(await fileData.arrayBuffer());
-                const decryptedData = await $connection.decrypt(fileArray);
+                const decryptedData = await conn.decrypt(fileArray);
 
                 const fileBlob = new Blob([decryptedData]);
                 const url = window.URL.createObjectURL(fileBlob);

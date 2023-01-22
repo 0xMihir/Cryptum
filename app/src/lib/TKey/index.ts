@@ -306,7 +306,7 @@ class TkeyConnection {
 	public async getNameVersion(): Promise<Uint8Array> {
 		const cmd = makeBuffer(commands.appCommands.cmdGetNameVersion);
 		await this.writeFrame(cmd);
-		const resp = await Promise.race([
+		const resp: any = await Promise.race([
 			this.readFrame(commands.appCommands.rspGetNameVersion),
 			new Promise((_r, rej) => setTimeout(() => rej('p2'), 500))
 		]);
