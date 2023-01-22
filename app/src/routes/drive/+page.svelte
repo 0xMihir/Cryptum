@@ -8,7 +8,7 @@
     import ErrorPopup from "$lib/ErrorPopup.svelte";
 	import { onMount } from "svelte";
 
-    /*const root = INode.fromJson(`{
+    const root = INode.fromJson(`{
         "type": "directory",
         "name": "root",
         "children": [
@@ -45,17 +45,16 @@
                 "uuid": "uuid2"
             }
         ]
-    }`) as Directory;*/
+    }`) as Directory;
 
     // temp until server loads
-    let root = new Directory("root");
-
+    //let root = new Directory("root");
 
     let fileManager: FileManager;
 
     let errorPopup: ErrorPopup;
 
-    async function getRootFromServer() {
+    /*async function getRootFromServer() {
         try {
             const res = await fetch("/files/root");
             const data = (await res.body?.getReader()?.read())?.value;
@@ -66,6 +65,7 @@
 
             const inode = INode.fromJson(new TextDecoder().decode(data));
             if (inode != null && inode instanceof Directory) {
+                fileManager.setRootDIrectory(inode);
                 root = inode;
             } else {
                 errorPopup.showError("invalid folder structure recieved from server");
@@ -75,7 +75,7 @@
         }
     }
 
-    onMount(() => getRootFromServer());
+    onMount(() => getRootFromServer());*/
 
     // updates the root file on server, returns false on failure
     async function updateRootOnServer(): Promise<boolean> {

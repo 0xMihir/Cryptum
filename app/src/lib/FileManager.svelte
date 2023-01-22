@@ -5,7 +5,14 @@
 
     export let rootDirectory: Directory;
 
-    $: directoryStack = [rootDirectory];
+    let directoryStack = [rootDirectory];
+
+    // this is kind of a hack to get around some wierd stuff with reactivity
+    // need to call this everytim root directory changes
+    export function setRootDirectory(root: Directory) {
+        rootDirectory = root;
+        directoryStack = [root];
+    }
 
     export function currentDirectory(): Directory {
         return directoryStack[directoryStack.length - 1];
@@ -27,7 +34,6 @@
 
         if (file instanceof Directory) {
             directoryStack = [...directoryStack, file];
-            console.log(directoryStack);
         } else if (file instanceof File) {
             const link = document.createElement("a");
             link.href = "/files/" + file.uuid;
