@@ -32,6 +32,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@esbuild/linux-x64": "^0.17.3",
 		"@fontsource/roboto": "^4.5.8",
 		"@fontsource/varela-round": "^4.5.9",
 		"@google-cloud/storage": "^6.9.0",
