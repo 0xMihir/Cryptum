@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Breadcrumb, BreadcrumbItem } from 'sveltestrap';
-	import { Directory, INode } from "./directoryTree";
+	import { Directory, INode, File } from "./directoryTree";
     import DirectoryView from "./DirectoryView.svelte";
 
     export let rootDirectory: Directory;
@@ -22,14 +22,17 @@
         }
     }
 
-    function openedFile(event: CustomEvent) {
+    function openFile(event: CustomEvent) {
         const file = event.detail;
 
         if (file instanceof Directory) {
             directoryStack = [...directoryStack, file];
             console.log(directoryStack);
         } else if (file instanceof File) {
-            // TODO: show file contents
+            const link = document.createElement("a");
+            link.href = "/files/" + file.uuid;
+            link.download = file.name;
+            link.click();
         }
     }
 
@@ -51,7 +54,7 @@
     </Breadcrumb>
 </div>
 
-<DirectoryView directory={directoryStack[directoryStack.length - 1]} on:fileOpened={openedFile}/>
+<DirectoryView directory={directoryStack[directoryStack.length - 1]} on:fileOpened={openFile}/>
 
 <style>
     .top-bar {
