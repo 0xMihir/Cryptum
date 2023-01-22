@@ -34,7 +34,7 @@
 </script>
 
 {#if showMenu}
-    <ContextMenu x={pos.x} y={pos.y}/>
+    <ContextMenu x={pos.x} y={pos.y} on:closemenu={() => showMenu = false}/>
 {/if}
 
 <div class="d-flex flex-row flex-wrap">
