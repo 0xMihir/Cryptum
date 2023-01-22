@@ -26,7 +26,7 @@
             let inode;
 
             if (res.ok) {
-                const data = new Uint8Array(await res.arrayBuffer());
+                const data = await $connection.decrypt(new Uint8Array(await res.arrayBuffer()));
                 inode = INode.fromJson(new TextDecoder().decode(data));
             } else {
                 inode = new Directory("root");
@@ -47,12 +47,12 @@
 
     // updates the root file on server, returns false on failure
     async function updateRootOnServer(): Promise<boolean> {
-        const rootJson = root.toString();
+        const rootJson = new TextEncoder().encode(root.toString());
 
         try {
             const res = await fetch("/files/root", {
                 method: "POST",
-                body: rootJson,
+                body: await $connection.encrypt(rootJson),
             });
             if (!res.ok) {
                 return false;
@@ -72,7 +72,7 @@
         try {
             const res = await fetch('/files', {
                 method: 'POST',
-                body: newFile.data,
+                body: await $connection.encrypt(new Uint8Array(newFile.data)),
                 headers: {"content-type": "application/octet-stream"}
             });
 

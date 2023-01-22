@@ -4,6 +4,7 @@
     import { Breadcrumb, BreadcrumbItem } from 'sveltestrap';
 	import { Directory, INode, File } from "./directoryTree";
     import DirectoryView from "./DirectoryView.svelte";
+	import { connection } from './stores/connection';
 
     const dispatcher = createEventDispatcher();
 
@@ -46,7 +47,10 @@
                     method: "GET",
                 });
 
-                const fileBlob = await fileData.blob();
+                const fileArray = new Uint8Array(await fileData.arrayBuffer());
+                const decryptedData = await $connection.decrypt(fileArray);
+
+                const fileBlob = new Blob([decryptedData]);
                 const url = window.URL.createObjectURL(fileBlob);
 
                 const link = document.createElement("a");
