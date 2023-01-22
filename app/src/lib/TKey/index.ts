@@ -1,4 +1,10 @@
-import { cmdByteLength, CommandStatus, type Command, type CommandEndpoint, type CommandLength } from './commands';
+import {
+	cmdByteLength,
+	CommandStatus,
+	type Command,
+	type CommandEndpoint,
+	type CommandLength
+} from './commands';
 import commands from './commands';
 import { blake2s } from 'blakejs';
 import { hexdump } from './utils';
@@ -187,7 +193,6 @@ class TkeyConnection {
 		return rsp.slice(2, 2 + 32);
 	}
 
-
 	public async signData(data: Uint8Array): Promise<Uint8Array> {
 		const sizeCmd = makeBuffer(commands.appCommands.cmdSetSize);
 		sizeCmd[2] = data.byteLength;
@@ -203,7 +208,7 @@ class TkeyConnection {
 
 		if (sizeRsp[2] !== CommandStatus.Success) {
 			throw new Error('Failed to set size');
-		}	
+		}
 
 		let offset = 0;
 
@@ -223,7 +228,7 @@ class TkeyConnection {
 		const lastSignCmd = makeBuffer(commands.appCommands.cmdSignData);
 		lastSignCmd.set(lastChunk, 2);
 		await this.writeFrame(lastSignCmd);
-		const signDataResp = await this.readFrame(commands.appCommands.rspSignData)
+		const signDataResp = await this.readFrame(commands.appCommands.rspSignData);
 		if (signDataResp[2] !== CommandStatus.Success) {
 			throw new Error('Failed to sign data');
 		}
@@ -236,7 +241,7 @@ class TkeyConnection {
 		}
 		console.log(getSigResp);
 
-		return getSigResp.slice(3, 3 + 64);	
+		return getSigResp.slice(3, 3 + 64);
 	}
 
 	public async encryptData(data: Uint8Array): Promise<Uint8Array> {
@@ -253,10 +258,10 @@ class TkeyConnection {
 
 	public async encrypt(input: Uint8Array): Promise<Uint8Array> {
 		let length = input.length + 8;
-		const paddingLength = length % 86;
+		const paddingLength = 86 - (length % 86);
 		length += paddingLength;
 
-		let data = new Uint8Array(length);
+		const data = new Uint8Array(length);
 		const n = input.length;
 		data[0] = n;
 		data[1] = n >> 8;
@@ -269,18 +274,16 @@ class TkeyConnection {
 
 		data.set(input, 8);
 
-		const endDataIndex = 8 + input.length;
+		const encryptOutput = new Uint8Array((127 * data.length) / 86);
 
-		for (let i = endDataIndex; i < endDataIndex + paddingLength; i++) {
-			data[i] = 0;
-		}
-
-		let encryptOutput = new Uint8Array(data.length);
-
+		console.log(input.byteLength, length)
+		console.log(data.byteLength)
+		console.log(encryptOutput.byteLength)
 		let ei = 0;
-		for (let pi = 0; pi < data.length; pi+=86) {
-			const decrypted = await this.decryptData(data.slice(pi, pi+87));
-			encryptOutput.set(decrypted, ei);
+		for (let pi = 0; pi < data.length; pi += 86) {
+			const encrypted = await this.encryptData(data.slice(pi, pi + 86));
+			console.log(ei);
+			encryptOutput.set(encrypted, ei);
 			ei += 127;
 		}
 
@@ -294,38 +297,49 @@ class TkeyConnection {
 		const decryptDataCmd = makeBuffer(commands.appCommands.cmdAEADDecrypt);
 
 		decryptDataCmd.set(data, 2);
-		
+
 		await this.writeFrame(decryptDataCmd);
 
 		return (await this.readFrame(commands.appCommands.rspAEADDecrypt)).slice(2);
 	}
 
+	public async getNameVersion(): Promise<Uint8Array> {
+		const cmd = makeBuffer(commands.appCommands.cmdGetNameVersion);
+		await this.writeFrame(cmd);
+		const resp = await Promise.race([
+			this.readFrame(commands.appCommands.rspGetNameVersion),
+			new Promise((_r, rej) => setTimeout(() => rej('p2'), 500))
+		]);
+
+		return resp.slice(2);
+	}
+
 	public async decrypt(data: Uint8Array): Promise<Uint8Array> {
 		if (data.length % 127 != 0) {
-			throw new Error("encrypted data must be a multiple of 127");
+			throw new Error('encrypted data must be a multiple of 127');
 		}
 
-		let decryptOutput = new Uint8Array(data.length);
+		const decryptOutput = new Uint8Array(data.length);
 
 		let di = 0;
-		for (let ei = 0; ei < data.length - 127; ei+=127) {
-			const decrypted = await this.decryptData(data.slice(ei, ei+127));
+		for (let ei = 0; ei < data.length; ei += 127) {
+			const decrypted = await this.decryptData(data.slice(ei, ei + 127));
 			decryptOutput.set(decrypted, di);
 			di += 86;
 		}
 
-		const length = data[0]
-			| data[1] << 8
-			| data[2] << 16
-			| data[3] << 24
-			| data[4] << 32
-			| data[5] << 40
-			| data[6] << 48
-			| data[7] << 56;
-		
+		const length =
+		decryptOutput[0] |
+			(decryptOutput[1] << 8) |
+			(decryptOutput[2] << 16) |
+			(decryptOutput[3] << 24) |
+			(decryptOutput[4] << 32) |
+			(decryptOutput[5] << 40) |
+			(decryptOutput[6] << 48) |
+			(decryptOutput[7] << 56);
+			
 		return decryptOutput.slice(8, 8 + length);
 	}
-
 
 	public async close(): Promise<void> {
 		if (this.reader) {
@@ -347,8 +361,6 @@ class TkeyConnection {
 		this.port = port;
 	}
 }
-
-
 
 export default {
 	makeBuffer,

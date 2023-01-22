@@ -50,8 +50,8 @@ export interface Command {
 	commandEndpoint: CommandEndpoint;
 }
 
-const cmdGetNameVersion = makeFirmwareCommand(0x01, CommandLength.CommandLen1);
-const rspGetNameVersion = makeFirmwareCommand(0x02, CommandLength.CommandLen32);
+const fw_cmdGetNameVersion = makeFirmwareCommand(0x01, CommandLength.CommandLen1);
+const fw_rspGetNameVersion = makeFirmwareCommand(0x02, CommandLength.CommandLen32);
 const cmdLoadApp = makeFirmwareCommand(0x03, CommandLength.CommandLen128);
 const rspLoadApp = makeFirmwareCommand(0x04, CommandLength.CommandLen4);
 const cmdLoadAppData = makeFirmwareCommand(0x05, CommandLength.CommandLen128);
@@ -59,8 +59,10 @@ const rspLoadAppData = makeFirmwareCommand(0x06, CommandLength.CommandLen4);
 const rspLoadAppDataReady = makeFirmwareCommand(0x07, CommandLength.CommandLen128);
 const cmdGetUDI = makeFirmwareCommand(0x08, CommandLength.CommandLen1);
 const rspGetUDI = makeFirmwareCommand(0x09, CommandLength.CommandLen32);
-// App commands
 
+// App commands
+const cmdGetNameVersion = makeFirmwareCommand(0x01, CommandLength.CommandLen1);
+const rspGetNameVersion = makeFirmwareCommand(0x02, CommandLength.CommandLen32);
 const cmdGetPublicKey = makeApplicationCommand(0x03, CommandLength.CommandLen1);
 const rspGetPublicKey = makeApplicationCommand(0x04, CommandLength.CommandLen128);
 const cmdSetSize = makeApplicationCommand(0x05, CommandLength.CommandLen32);
@@ -88,6 +90,8 @@ export default {
 		rspGetUDI
 	},
 	appCommands: {
+		cmdGetNameVersion,
+		rspGetNameVersion,
 		cmdGetPublicKey,
 		rspGetPublicKey,
 		cmdSetSize,
