@@ -47,14 +47,17 @@
     <button on:click={createUser}>Create User</button>
 </body>
 
-
+<svelte:head>
+  <style>
+    .create-page-bg {
+        background: linear-gradient(-45deg, #2300FF, #000, #FF0790);
+        background-size: 400% 400%;
+        animation: gradient 7s ease infinite;
+    }
+  </style>
+</svelte:head>
 
 <style>
-    .create-page-bg {
-	background: linear-gradient(-45deg, #2300FF, #000, #FF0790);
-	background-size: 400% 400%;
-	animation: gradient 7s ease infinite;
-}
 
 @keyframes gradient {
 	0% {
