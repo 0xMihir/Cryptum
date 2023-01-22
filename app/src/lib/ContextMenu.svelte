@@ -16,6 +16,38 @@
 
 	let delayCloseMenu = false;
 
+	const renameConfirm = newConfirm();
+	let renameName = "";
+	function renameNode() {
+		delayCloseMenu = true;
+
+		renameName = node.name;
+		renameConfirm.confirm(async confirmed => {
+			if (confirmed) {
+				if (currentDirectory.hasFile(renameName)) {
+					return ConfirmError("this directory already contains a file with that name");
+				}
+
+				currentDirectory.removeChildInode(node);
+				node.name = renameName;
+				currentDirectory.addChild(node);
+
+				// without this timeout, we have graphical glitches
+				setTimeout(() => {
+					dispatch('closemenu');
+					delayCloseMenu = false;
+				}, 500);
+
+				dispatch("foldersUpdated");
+				return ConfirmOk;
+			} else {
+				dispatch('closemenu');
+				delayCloseMenu = false;
+				return ConfirmOk;
+			}
+		})
+	}
+
 	interface Option {
         name: string,
         value: any,
@@ -51,7 +83,7 @@
 				}
 
 				if (selectedLocation.hasFile(node.name)) {
-					return ConfirmError("this directory already contains a file with the same name");
+					return ConfirmError("that directory already contains a file with the same name");
 				}
 
 				currentDirectory.removeChildInode(node);
@@ -62,7 +94,7 @@
 					dispatch('closemenu');
 					delayCloseMenu = false;
 				}, 500);
-				
+
 				dispatch("foldersUpdated");
 				return ConfirmOk;
 			} else {
@@ -85,10 +117,18 @@
 <!--TODO: Handle if it's a directory instead-->
 <div class="menu" style={menuStyle} >
 	<div class="option-container">
+		<button on:click={renameNode} class="option">Rename File</button>
 		<button on:click={moveNode} class="option">Move File</button>
 		<button on:click={removeNode} class="option">Remove File</button>
 	</div>
 </div>
+
+<Confirmation header="Rename File" confirmationStore={renameConfirm}>
+	<FormGroup>
+		<Label for="newName">Enter New Filename</Label>
+		<input id="newName" type="text" class="form-control" bind:value={renameName}/>
+	</FormGroup>
+</Confirmation>
 
 <Confirmation header="Move File" confirmationStore={moveConfirm}>
 	<FormGroup>
