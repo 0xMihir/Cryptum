@@ -118,5 +118,6 @@
 		display: inline-block;
 		border-radius: 30px;
 		font-size: 30px;
+		margin: auto;
 	}
 </style>
