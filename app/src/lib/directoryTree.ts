@@ -41,7 +41,7 @@ export class INode {
         }
 	}
 
-	toJson(): string {
+	toString(): string {
 		return JSON.stringify(this.serialize());
 	}
 

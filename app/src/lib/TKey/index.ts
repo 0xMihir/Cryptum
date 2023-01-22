@@ -39,7 +39,7 @@ const makeBuffer = (command: Command, id?: number): Uint8Array => {
 	return buffer;
 };
 
-const loadApp = (size: number, userSecret: string): Uint8Array => {
+const loadApp = (size: number, userSecret?: string): Uint8Array => {
 	const buffer = makeBuffer(commands.firmwareCommands.cmdLoadApp, 2);
 
 	buffer[2] = size;
@@ -47,7 +47,7 @@ const loadApp = (size: number, userSecret: string): Uint8Array => {
 	buffer[4] = size >> 16;
 	buffer[5] = size >> 24;
 
-	if (userSecret.length == 0) {
+	if (!userSecret || userSecret.length == 0) {
 		buffer[6] = 0;
 	} else {
 		buffer[6] = 1;
@@ -142,8 +142,8 @@ class TkeyConnection {
 		return buffer;
 	}
 
-	public async loadBinary(app: Uint8Array): Promise<boolean> {
-		const loadAppCmd = loadApp(app.byteLength, 'password');
+	public async loadBinary(app: Uint8Array, secret?: string): Promise<boolean> {
+		const loadAppCmd = loadApp(app.byteLength, secret);
 		const localDigest = blake2s(app);
 
 		await this.writeFrame(loadAppCmd);
@@ -240,18 +240,30 @@ class TkeyConnection {
 	}
 
 	public async encryptData(data: Uint8Array): Promise<Uint8Array> {
-		if (data.byteLength > 16 * 7) {
+		if (data.byteLength > 127) {
 			throw new Error('Data too long');
 		}
 		const encryptDataCmd = makeBuffer(commands.appCommands.cmdAEADEncrypt);
 
 		encryptDataCmd.set(data, 2);
 
-		console.log(hexdump(encryptDataCmd));
-
 		await this.writeFrame(encryptDataCmd);
-		return await this.readFrame(commands.appCommands.rspAEADEncrypt);
+		return (await this.readFrame(commands.appCommands.rspAEADEncrypt)).slice(3);
 	}
+
+	public async decryptData(data: Uint8Array): Promise<Uint8Array> {
+		if (data.byteLength > 127) {
+			throw new Error('Data too long');
+		}
+		const decryptDataCmd = makeBuffer(commands.appCommands.cmdAEADDecrypt);
+
+		decryptDataCmd.set(data, 2);
+		
+		await this.writeFrame(decryptDataCmd);
+
+		return (await this.readFrame(commands.appCommands.rspAEADDecrypt)).slice(2);
+	}
+
 
 	public async close(): Promise<void> {
 		if (this.reader) {
@@ -269,7 +281,7 @@ class TkeyConnection {
 		this.readTimeout = timeout;
 	}
 
-	private constructor(port: SerialPort) {
+	constructor(port: SerialPort) {
 		this.port = port;
 	}
 }

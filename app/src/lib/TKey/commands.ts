@@ -71,6 +71,9 @@ const cmdGetSignature = makeApplicationCommand(0x09, CommandLength.CommandLen1);
 const rspGetSignature = makeApplicationCommand(0x0a, CommandLength.CommandLen128);
 const cmdAEADEncrypt = makeApplicationCommand(0x0b, CommandLength.CommandLen128);
 const rspAEADEncrypt = makeApplicationCommand(0x0c, CommandLength.CommandLen128);
+const cmdAEADDecrypt = makeApplicationCommand(0x0d, CommandLength.CommandLen128);
+const rspAEADDecrypt = makeApplicationCommand(0x0e, CommandLength.CommandLen128);
+
 
 export default {
 	firmwareCommands: {
@@ -94,6 +97,8 @@ export default {
 		cmdGetSignature,
 		rspGetSignature,
 		cmdAEADEncrypt,
-		rspAEADEncrypt
+		rspAEADEncrypt,
+		cmdAEADDecrypt,
+		rspAEADDecrypt
 	}
 };

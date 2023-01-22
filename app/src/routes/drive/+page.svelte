@@ -8,6 +8,8 @@
     import ErrorPopup from "$lib/ErrorPopup.svelte";
 	import { onMount } from "svelte";
     import { connection } from "$lib/stores/connection";
+    import TKey from "$lib/TKey";
+
 
     // temp until server loads
     let root = new Directory("root");
@@ -21,13 +23,24 @@
             const res = await fetch("/files/root", {
                 method: "GET",
             });
-            const data = (await res.body?.getReader()?.read())?.value;
+            const data = new Uint8Array(await res.arrayBuffer())
             if (data == null) {
                 errorPopup.showError("could not retrieve files from server");
                 return;
-            }
+            }           
 
-            
+            const conn = $connection;
+
+            let decryptedBuffer = new Uint8Array(129);
+
+            for (let i = 0; i < data.length - 127; i+=127) {
+                const decrypted = await conn.decryptData(data.slice(i, i+127));
+                // concat decrypted data
+                const temp = new Uint8Array(decryptedBuffer.length + decrypted.length);
+                temp.set(decryptedBuffer);
+                temp.set(decrypted, decryptedBuffer.length);
+                decryptedBuffer = temp;  
+            }
 
 
             const inode = INode.fromJson(new TextDecoder().decode(data));
@@ -46,7 +59,8 @@
 
     // updates the root file on server, returns false on failure
     async function updateRootOnServer(): Promise<boolean> {
-        const rootJson = root.toJson();
+        const rootJson = root.toString();
+
         try {
             const res = await fetch("/files/root", {
                 method: "POST",
