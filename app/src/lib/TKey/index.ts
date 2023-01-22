@@ -239,6 +239,20 @@ class TkeyConnection {
 		return getSigResp.slice(3, 3 + 64);	
 	}
 
+	public async encryptData(data: Uint8Array): Promise<Uint8Array> {
+		if (data.byteLength > 16 * 7) {
+			throw new Error('Data too long');
+		}
+		const encryptDataCmd = makeBuffer(commands.appCommands.cmdAEADEncrypt);
+
+		encryptDataCmd.set(data, 2);
+
+		console.log(hexdump(encryptDataCmd));
+
+		await this.writeFrame(encryptDataCmd);
+		return await this.readFrame(commands.appCommands.rspAEADEncrypt);
+	}
+
 	public async close(): Promise<void> {
 		if (this.reader) {
 			await this.reader.cancel();

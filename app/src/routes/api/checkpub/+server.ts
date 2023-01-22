@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
-import { Client } from 'pg';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
+import { Client } from 'pg';
 import { DATABASE_URL } from '$env/static/private';
 
 export const POST = (async (request) => {

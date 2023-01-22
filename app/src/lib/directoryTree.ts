@@ -52,7 +52,7 @@ export class INode {
 
 export interface NewFile {
 	name: string,
-	data: string | ArrayBuffer,
+	data: ArrayBuffer,
 }
 
 export class File extends INode {

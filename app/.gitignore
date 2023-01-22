@@ -11,3 +11,4 @@ vite.config.ts.timestamp-*
 user_files
 /.vscode/
 /static/app.bin
+gc_keyfile

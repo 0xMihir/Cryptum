@@ -29,6 +29,10 @@ void appreply(struct frame_header hdr, enum appcmd rspcode, void *buf)
 		len = LEN_1;
 		break;
 
+	case APP_RSP_AEAD_ENCRYPT:
+		len = LEN_128;
+		break;
+
 	default:
 		return;
 	}

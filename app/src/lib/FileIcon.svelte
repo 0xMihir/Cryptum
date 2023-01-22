@@ -4,7 +4,7 @@
     export let selected: boolean;
 </script>
 
-<div on:click class:text-bg-primary={selected} class="rounded file-icon d-flex flex-column align-items-center">
+<div on:click on:contextmenu|preventDefault class:text-bg-primary={selected} class="rounded file-icon d-flex flex-column align-items-center">
     <img class="file-icon-image" src={icon}/>
     <p class="text-center">{name}</p>
 </div>
