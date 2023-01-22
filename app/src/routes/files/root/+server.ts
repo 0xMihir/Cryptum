@@ -2,9 +2,10 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import { getUserFileUuid } from '$lib/server/db';
 import { createObject, getObject } from '$lib/server/googleCloud';
+import { pubKeyFromJwt } from '$lib/server/jwt';
 
 async function getUserRootUuid(requestEvent: RequestEvent): Promise<string> {
-	const pubKey = (await requestEvent.request.json())['uuid'];
+	const pubKey = pubKeyFromJwt(requestEvent);
 	const uuid = await getUserFileUuid(pubKey);
 	if (uuid != null) {
 		return uuid;
@@ -16,7 +17,18 @@ async function getUserRootUuid(requestEvent: RequestEvent): Promise<string> {
 // returns the root folder for the current user
 export async function GET(requestEvent: RequestEvent): Promise<Response> {
 	const uuid = await getUserRootUuid(requestEvent);
-	return new Response(await getObject(uuid));
+	const rootData = await getObject(uuid);
+
+	if (rootData == null) {
+		// root data not yet created, return empty root
+		return new Response(`{
+			"type": "directory",
+			"name": "root",
+			"children": []
+		}`);
+	} else {
+		return new Response(rootData);
+	}
 }
 
 // set the root folder for the current user

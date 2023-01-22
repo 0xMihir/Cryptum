@@ -8,7 +8,7 @@
     import ErrorPopup from "$lib/ErrorPopup.svelte";
 	import { onMount } from "svelte";
 
-    const root = INode.fromJson(`{
+    /*const root = INode.fromJson(`{
         "type": "directory",
         "name": "root",
         "children": [
@@ -45,18 +45,20 @@
                 "uuid": "uuid2"
             }
         ]
-    }`) as Directory;
+    }`) as Directory;*/
 
     // temp until server loads
-    //let root = new Directory("root");
+    let root = new Directory("root");
 
     let fileManager: FileManager;
 
     let errorPopup: ErrorPopup;
 
-    /*async function getRootFromServer() {
+    async function getRootFromServer() {
         try {
-            const res = await fetch("/files/root");
+            const res = await fetch("/files/root", {
+                method: "GET",
+            });
             const data = (await res.body?.getReader()?.read())?.value;
             if (data == null) {
                 errorPopup.showError("could not retrieve files from server");
@@ -65,7 +67,7 @@
 
             const inode = INode.fromJson(new TextDecoder().decode(data));
             if (inode != null && inode instanceof Directory) {
-                fileManager.setRootDIrectory(inode);
+                fileManager.setRootDirectory(inode);
                 root = inode;
             } else {
                 errorPopup.showError("invalid folder structure recieved from server");
@@ -75,7 +77,7 @@
         }
     }
 
-    onMount(() => getRootFromServer());*/
+    onMount(() => getRootFromServer());
 
     // updates the root file on server, returns false on failure
     async function updateRootOnServer(): Promise<boolean> {
@@ -149,6 +151,10 @@
 </script>
 
 <div class="sidebar bg-dark">
+    <div class="spacing logo">
+        <img src="logo.png" alt="logo"/>
+        <h1 class="text-light">Cryptum</h1>
+    </div>
     <div class="spacing">
         <Upload on:fileUploaded={event => addFile(event.detail)}></Upload>
     </div>
@@ -170,8 +176,13 @@
 <ErrorPopup bind:this={errorPopup}/>
 
 <style>
+    .logo {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
     .file-manager {
-        margin-left: 250px;
+        margin-left: 350px;
     }
     .center {
         margin: auto;
@@ -183,7 +194,7 @@
     .sidebar {
         display: block;
         position: fixed;
-        width: 250px;
+        width: 350px;
         height: 100%;
         padding: 25px;
     }

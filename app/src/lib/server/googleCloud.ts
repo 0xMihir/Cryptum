@@ -1,7 +1,8 @@
 import { error } from '@sveltejs/kit';
 import { Storage } from '@google-cloud/storage';
 
-export async function getObject(name: string): Promise<string> {
+// returns null if file doesn't exist
+export async function getObject(name: string): Promise<string | null> {
     const storage = new Storage({
 		projectId: 'cryptum',
 		keyFilename: 'gc_keyfile/cryptum-cc63e7b7ac73.json'
@@ -15,9 +16,11 @@ export async function getObject(name: string): Promise<string> {
 		return contents.toString();
 	}
 
-	return await streamFile().catch(() => {
-		throw error(500, 'unable to download file');
-	});
+	try {
+		return await streamFile();
+	} catch (e) {
+		return null;
+	}
 }
 
 export async function createObject(name: string, data: Uint8Array) {
