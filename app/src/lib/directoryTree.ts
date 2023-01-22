@@ -71,6 +71,12 @@ export class File extends INode {
 			uuid: this.uuid
 		};
 	}
+
+	async deleteFromServer() {
+		await fetch("/files/" + this.uuid, {
+			method: "DELETE",
+		});
+	}
 }
 
 export class Directory extends INode {
