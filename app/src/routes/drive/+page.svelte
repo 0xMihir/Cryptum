@@ -21,14 +21,7 @@
             const res = await fetch("/files/root", {
                 method: "GET",
             });
-            const data = (await res.body?.getReader()?.read())?.value;
-            if (data == null) {
-                errorPopup.showError("could not retrieve files from server");
-                return;
-            }
-
-            
-
+            const data = new Uint8Array(await res.arrayBuffer());
 
             const inode = INode.fromJson(new TextDecoder().decode(data));
             if (inode != null && inode instanceof Directory) {
@@ -74,8 +67,8 @@
                 headers: {"content-type": "application/octet-stream"}
             });
 
-            const body = (await res?.body?.getReader()?.read())?.value;
-            if (res.ok && res.body != null) {
+            if (res.ok) {
+                const body = new Uint8Array(await res.arrayBuffer());
                 const file = new File(newFile.name, new TextDecoder().decode(body));
                 fileManager.addFile(file);
             } else {
