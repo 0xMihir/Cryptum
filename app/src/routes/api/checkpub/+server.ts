@@ -9,7 +9,7 @@ export const POST = (async ({ request }) => {
 	const client = new Client(DATABASEURL); //process.env.DATABASE_URL
 	try {
 		await client.connect();
-		await client.query('CREATE TABLE IF NOT EXISTS users (name TEXT, pubkey TEXT, uuid TEXT)');
+		await client.query('CREATE TABLE IF NOT EXISTS users (name TEXT NOT NULL UNIQUE, pubkey TEXT NOT NULL UNIQUE, uuid TEXT NOT NULL UNIQUE)');
 	} catch (e) {
 		throw error(500, 'Could not connect to database');
 	}

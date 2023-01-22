@@ -102,7 +102,8 @@ class TkeyConnection {
 		let offset = 0;
 
 		const start = Date.now();
-		while (Date.now() - start < this.readTimeout) {
+		// while (Date.now() - start < this.readTimeout) {
+		while (true) {
 			if (offset >= buffer.length) {
 				break;
 			}
@@ -125,6 +126,8 @@ class TkeyConnection {
 		const header = parseHeader(buffer[0]);
 
 		if (header.ID !== expectedID) {
+			console.log(hexdump(buffer));
+			console.log(header);
 			throw new Error(`Expected ID ${expectedID} but got ${header.ID}`);
 		}
 		if (expectedCommand.commandLength !== header.CommandLength) {
