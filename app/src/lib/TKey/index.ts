@@ -119,7 +119,7 @@ class TkeyConnection {
 			}
 		}
 
-		if (buffer[0] == 0) {
+		while (buffer[0] == 0) {
 			buffer = buffer.slice(1);
 		}
 
