@@ -4,8 +4,13 @@ import * as ed from '@noble/ed25519';
 import { TOKEN_KEY } from '$env/static/private';
 
 
-const fromHexString = (hexString: string) =>
-	Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
+const fromHexString = (hexString: string) =>{
+	let temp = hexString.match(/.{1,2}/g);
+	if ( temp != null) {
+		Uint8Array.from(temp.map((byte) => parseInt(byte, 16)));
+	}
+}
+	
 
 export const POST = (async ({ request, cookies }) => {
 	const data = await request.json();
