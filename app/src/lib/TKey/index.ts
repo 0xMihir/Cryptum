@@ -1,6 +1,7 @@
 import { cmdByteLength, CommandStatus, type Command, type CommandEndpoint, type CommandLength } from './commands';
 import commands from './commands';
 import { blake2s } from 'blakejs';
+import { hexdump } from './utils';
 
 interface FramingHeader {
 	ID: number;
@@ -186,6 +187,8 @@ class TkeyConnection {
 		sizeCmd[3] = data.byteLength >> 8;
 		sizeCmd[4] = data.byteLength >> 16;
 		sizeCmd[5] = data.byteLength >> 24;
+
+		console.log('sizeCmd', hexdump(sizeCmd));
 
 		await this.writeFrame(sizeCmd);
 

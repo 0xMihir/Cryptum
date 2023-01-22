@@ -13,12 +13,12 @@ export const POST = (async ({ request }) => {
 	} catch (e) {
 		throw error(500, 'Could not connect to database');
 	}
-	let result = await request.json();
+	const data = await request.json();
 	const query = {
 		// give the query a unique name
 		name: 'check-exists',
 		text: 'SELECT * FROM users WHERE pubkey = $1',
-		values: [result['uuid']] //should be pubkey
+		values: [data.pubKey] //should be pubkey
 	};
 	const results = await (await client.query(query)).rows;
 	if (results.length > 0) {

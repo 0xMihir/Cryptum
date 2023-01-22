@@ -123,6 +123,7 @@ int main(void)
 			// cmd[1..4] contains the size.
 			message_size = cmd[1] + (cmd[2] << 8) + (cmd[3] << 16) +
 				       (cmd[4] << 24);
+			led_steady = LED_RED;
 
 			if (message_size > MAX_SIGN_SIZE) {
 				rsp[0] = STATUS_BAD;

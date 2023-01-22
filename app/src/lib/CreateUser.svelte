@@ -4,11 +4,11 @@
     export let document: any;
 
     let username = '';
-    const uuid:any = getCookie('uuid'); //pubkey
+    const pubKey:any = getCookie('pubKey'); //pubkey
 
-    //validate the uuid/public key somehow
+    //validate the public key somehow
 
-    if (!uuid) {
+    if (!pubKey) {
         error(500, 'No valid public key found');
     }
     const createUser = () =>
@@ -17,12 +17,12 @@
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username, uuid }),
+            body: JSON.stringify({ username, pubKey }),
         })
         .then((res) => res.json())
         .then(async (data) => {
             if (data.success) {
-                const name = await getname(uuid);
+                const name = await getname(pubKey);
                 setCookie('username', name);
                 goto('/drive'); //TODO: add user param
             } else {
@@ -52,10 +52,10 @@
 		// Set it
 		document.cookie = name+"="+value+"; expires="+date.toUTCString()+"; path=/";
 	}
-    async function getname(uuid: String) {
+    async function getname(pubKey: string) {
 		const response = await fetch('/api/getname', {
 			method: 'POST',
-			body: JSON.stringify({ uuid }),
+			body: JSON.stringify({ pubKey }),
 			headers: {
 				'content-type': 'application/json'
 			}

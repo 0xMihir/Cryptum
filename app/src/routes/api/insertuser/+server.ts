@@ -13,12 +13,12 @@ export const POST = (async ({ request }) => {
 	} catch (e) {
 		throw error(500, 'Could not connect to database');
 	}
-	let result = await request.json();
+	const data = await request.json();
 	const query = {
 		// give the query a unique name
 		name: 'insert-user',
 		text: 'INSERT INTO users (name, pubkey, uuid) VALUES ($1, $2, $3)',
-		values: [result['username'], result['uuid'], randomUUID()] //uuid should be pubkey
+		values: [data.username, data.pubKey, randomUUID()]
 	};
 	try {
 		return new Response(JSON.stringify({ success: true }));

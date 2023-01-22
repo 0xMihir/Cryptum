@@ -4,10 +4,10 @@
     import tk from '$lib/TKey';
 	import "@fontsource/roboto";
 
-	async function doesUserExist(uuid: string) {
+	async function doesUserExist(pubKey: string) {
 		const response = await fetch('/api/checkpub', {
 			method: 'POST',
-			body: JSON.stringify({ uuid }),
+			body: JSON.stringify({ pubKey }),
 			headers: {
 				'content-type': 'application/json'
 			}
@@ -32,10 +32,10 @@
 		}
 	}
 
-	async function getName(uuid: string) {
+	async function getName(pubKey: string) {
 		const response = await fetch('/api/name', {
 			method: 'POST',
-			body: JSON.stringify({ uuid }),
+			body: JSON.stringify({ pubKey }),
 			headers: {
 				'content-type': 'application/json'
 			}
@@ -80,18 +80,18 @@
         const { nonce } = await getNonce(); // random string
 		
 		const signed = await conn.signData(new TextEncoder().encode(nonce));
-		const signature = new TextDecoder().decode(signed);
+		const sig = toHex(signed);
+
+		const response = await fetch('/api/login', {
+			method: 'POST',
+			body: JSON.stringify({ pubKey: pubKey, nonce, sig }),
+			headers: {
+				'content-type': 'application/json'
+			}
+		});
+
 		const data = await doesUserExist(pubKey);
 		const name = await getName(pubKey);
-
-		if (data["exists"]) {
-			setCookie('uuid', pubKey);
-			setCookie('name',name["results"][0]["name"]);
-			return await goto('/drive');
-		} else {
-			setCookie('uuid', pubKey);
-			return await goto('/create');
-		}
 	};
 	/*
 	* General utils for managing cookies in Typescript.
