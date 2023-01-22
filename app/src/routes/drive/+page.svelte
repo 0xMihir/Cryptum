@@ -1,6 +1,6 @@
 <script lang="ts">
     import { FormGroup, Label } from "sveltestrap";
-	import { Directory, INode, File } from "$lib/directoryTree";
+	import { Directory, INode, File, type NewFile } from "$lib/directoryTree";
 	import Upload from "$lib/Upload.svelte";
 	import FileManager from "$lib/FileManager.svelte";
 	import { ConfirmError, ConfirmOk, newConfirm } from "$lib/confirm/confirm";
@@ -50,9 +50,27 @@
 
     let errorPopup: ErrorPopup;
 
-    function addFile(file: File) {
-        if (!fileManager.addFile(file)) {
+    async function addFile(newFile: NewFile) {
+        if (fileManager.currentDirectory().hasFile(newFile.name)) {
             errorPopup.showError("could not add file, a file or folder with the name already exists");
+            return;
+        }
+
+        try {
+            const res = await fetch('/files', {
+                method: 'POST',
+                body: newFile.data,
+            });
+
+            const body = (await res?.body?.getReader()?.read())?.value;
+            if (res.ok && res.body != null) {
+                const file = new File(newFile.name, new TextDecoder().decode(body));
+                fileManager.addFile(file);
+            } else {
+                errorPopup.showError("could not upload file to server");
+            }
+        } catch (e) {
+            errorPopup.showError("could not upload file to server");
         }
     }
 

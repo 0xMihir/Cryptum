@@ -50,6 +50,11 @@ export class INode {
 	}
 }
 
+export interface NewFile {
+	name: string,
+	data: string | ArrayBuffer,
+}
+
 export class File extends INode {
 	uuid: string;
 	data: Uint8Array | null = null;

@@ -2,10 +2,6 @@
 	import { onMount } from 'svelte';
 	import Login from '../lib/Login.svelte';
 	import "@fontsource/roboto";
-
-	onMount(() => {
-		console.log('Hello from SvelteKit');
-	});
 </script>
 <video id="background-video"
 	src="../static/videos/landing-page-bg.mp4"
@@ -23,9 +19,15 @@
 
 
 <style>
+	@font-face {
+        font-family: 'VarelaRound-Regular';
+        font-style: normal;
+        font-weight: 400;
+        src: local('VarelaRound-Regular') url('../static/fonts/VarelaRound-Regular.woff') format('woff');
+    }
 	h1 {
 		font-size: 70px;
-		font-family: 'Roboto', sans-serif;
+		font-family: 'VarelaRound-Regular';
 		font-weight: 200;
 		background: white;
 		color: transparent;
@@ -36,7 +38,7 @@
 	h2 {
 		font-size: 25px;
 		font-weight: 200;
-		font-family: 'Roboto', sans-serif;
+		font-family: 'VarelaRound';
 		background-image: linear-gradient(to left, #FF0790, #2300FF);
 		color: transparent;
 		background-clip: text;
