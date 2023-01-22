@@ -1,11 +1,10 @@
 <script lang='ts'>
 	import { goto } from "$app/navigation";
 	import { error, redirect } from "@sveltejs/kit";
-    export let document: any;
 
     let username = '';
-    const pubKey:any = getCookie('pubKey'); //pubkey
-
+    // const pubKey:any = getCookie('pubKey'); //pubkey
+    const pubKey = 'cygnusx26';
     //validate the public key somehow
 
     if (!pubKey) {
@@ -13,7 +12,7 @@
     }
     const createUser = () =>
         fetch('/api/insertuser', {
-            method: 'POST',
+            method: 'POST', 
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -22,8 +21,7 @@
         .then((res) => res.json())
         .then(async (data) => {
             if (data.success) {
-                const name = await getname(pubKey);
-                setCookie('username', name);
+                setCookie('username', username);
                 goto('/drive'); //TODO: add user param
             } else {
                 error(500, 'User creation failed');
@@ -33,15 +31,6 @@
             console.log(err);
         });
 
-    function getCookie(name: string) {
-		const value = "; " + document.cookie;
-		const parts = value.split("; " + name + "=");
-
-		if (parts.length == 2) {
-			// @ts-ignore
-			return parts.pop().split(";").shift();
-		}
-	}
     function setCookie(name: string, val: string) {
 		const date = new Date();
 		const value = val;
@@ -52,23 +41,8 @@
 		// Set it
 		document.cookie = name+"="+value+"; expires="+date.toUTCString()+"; path=/";
 	}
-    async function getname(pubKey: string) {
-		const response = await fetch('/api/getname', {
-			method: 'POST',
-			body: JSON.stringify({ pubKey }),
-			headers: {
-				'content-type': 'application/json'
-			}
-		});
-		if (response.ok) {
-			const data = await response.json();
-			return data;
-		} else {
-			console.log('error');
-		}
-	}
 </script>
-<body>
+<body class='create-page-bg'>
     <input type="text" bind:value={username} />
     <button on:click={createUser}>Create User</button>
 </body>
@@ -76,7 +50,7 @@
 
 
 <style>
-    body {
+    .create-page-bg {
 	background: linear-gradient(-45deg, #2300FF, #000, #FF0790);
 	background-size: 400% 400%;
 	animation: gradient 7s ease infinite;
