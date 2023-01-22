@@ -82,11 +82,9 @@
         const { nonce } = await getNonce(); 
 
 		const signed = await conn.signData(fromHex(nonce));
-		const sig = toHex(signed);
+		const sig = toHex(signed);		
 
-
-
-		const response = await fetch('/api/login', {
+		await fetch('/api/login', {
 			method: 'POST',
 			body: JSON.stringify({ pubKey: pubKey, nonce, sig }),
 			headers: {
