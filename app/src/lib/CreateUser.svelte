@@ -42,32 +42,51 @@
 		document.cookie = name+"="+value+"; expires="+date.toUTCString()+"; path=/";
 	}
 </script>
-<body class='create-page-bg'>
-    <input type="text" bind:value={username} />
-    <button on:click={createUser}>Create User</button>
-</body>
+    <input class= "input" type="text" bind:value={username} />
+<div class="create-button-container">
+    <button  class='create-button' on:click={createUser}>Create User</button>
+</div>
 
-<svelte:head>
-  <style>
-    .create-page-bg {
-        background: linear-gradient(-45deg, #2300FF, #000, #FF0790);
-        background-size: 400% 400%;
-        animation: gradient 7s ease infinite;
-    }
-  </style>
-</svelte:head>
 
 <style>
-
-@keyframes gradient {
-	0% {
-		background-position: 0% 50%;
-	}
-	50% {
-		background-position: 100% 50%;
-	}
-	100% {
-		background-position: 0% 50%;
-	}
+    .create-button {
+        margin: 0 auto;
+  color: white;
+  margin-top: 20px;
+  background: #1d1d1d;
+  height: 40px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 300;
+  transition: 0.5s;
+  justify-content: center;
+  align-items: center;
+  font-size: medium;
+  color: white;
+  display:flex;
+  align-items: center;
+  text-align: center;
+}
+.create-button:hover {
+  box-shadow: none;
+  background-image: linear-gradient(to left, #642f4c, #372e6c);
+  scale: 1.1;
+}
+input::placeholder {
+  color: gray;
+}
+input:hover{
+    box-shadow: none;
+    scale: 1.1;
+    transition: all 0.4s ease-in-out;
+}
+input {
+    background-image: linear-gradient(to left, #642f4c, #372e6c);
+  padding: 10px;
+  padding-left: 20px;
+  height: 50px;
+  font-size: 14px;
+  border-radius: 50px;
+  color: #e0e0e0;
 }
 </style>

@@ -117,13 +117,14 @@
 		border: none;
 		font-family: 'Roboto', sans-serif;
 		color: white;
-		padding: 20px 32px;
+		padding: 10px 32px;
 		text-align: center;
 
 		text-decoration: none;
-		display: inline-block;
+		display: block;
 		border-radius: 30px;
-		font-size: 30px;
+		font-size: 20px;
 		margin: auto;
+		height: 70%;
 	}
 </style>
