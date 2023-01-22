@@ -69,6 +69,8 @@
         }
     }
 
+    getRootFromServer();
+
     let fileManager: FileManager;
 
     let errorPopup: ErrorPopup;
