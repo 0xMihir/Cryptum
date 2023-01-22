@@ -3,13 +3,8 @@ import { DATABASE_URL } from '$env/static/private';
 
 export async function getUserFileUuid(userPubKey: string): Promise<string | null> {
 	const DATABASEURL = DATABASE_URL;
-	const config = {
-		connectionString: DATABASEURL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	};
-	const client = new Client(config); //process.env.DATABASE_URL
+
+	const client = new Client(DATABASEURL); //process.env.DATABASE_URL
 	try {
 		await client.connect();
 	} catch (e) {
