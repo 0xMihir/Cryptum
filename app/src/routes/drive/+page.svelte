@@ -106,6 +106,7 @@
             const res = await fetch('/files', {
                 method: 'POST',
                 body: newFile.data,
+                headers: {"content-type": "application/octet-stream"}
             });
 
             const body = (await res?.body?.getReader()?.read())?.value;

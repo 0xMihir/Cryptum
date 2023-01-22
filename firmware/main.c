@@ -13,10 +13,10 @@ static volatile uint32_t *led = (volatile uint32_t *)TK1_MMIO_TK1_LED;
 static volatile uint32_t *touch = (volatile uint32_t *)TK1_MMIO_TOUCH_STATUS;
 static volatile uint32_t *trng_status = (volatile uint32_t *)TK1_MMIO_TRNG_STATUS;
 static volatile uint32_t *trng_entropy =(volatile uint32_t *)TK1_MMIO_TRNG_ENTROPY;
-static volatile uint32_t *can_rx = (volatile uint32_t *)TK1_MMIO_UART_RX_STATUS;
-static volatile uint32_t *rx = (volatile uint32_t *)TK1_MMIO_UART_RX_DATA;
-static volatile uint32_t *can_tx = (volatile uint32_t *)TK1_MMIO_UART_TX_STATUS;
-static volatile uint32_t *tx = (volatile uint32_t *)TK1_MMIO_UART_TX_DATA;
+// static volatile uint32_t *can_rx = (volatile uint32_t *)TK1_MMIO_UART_RX_STATUS;
+// static volatile uint32_t *rx = (volatile uint32_t *)TK1_MMIO_UART_RX_DATA;
+// static volatile uint32_t *can_tx = (volatile uint32_t *)TK1_MMIO_UART_TX_STATUS;
+// static volatile uint32_t *tx = (volatile uint32_t *)TK1_MMIO_UART_TX_DATA;
 
 #define LED_BLACK 0
 #define LED_RED (1 << TK1_MMIO_TK1_LED_R_BIT)
@@ -29,6 +29,28 @@ const uint8_t app_name1[4] = "tum ";
 const uint32_t app_version = 0x00000001;
 
 #define MAX_SIGN_SIZE 4096
+
+void get_random(uint8_t *buf, int bytes)
+{
+	int left = bytes;
+	for (;;)
+	{
+		while ((*trng_status & (1 << TK1_MMIO_TRNG_STATUS_READY_BIT)) ==
+			   0)
+		{
+		}
+		uint32_t rnd = *trng_entropy;
+		if (left > 4)
+		{
+			memcpy(buf, &rnd, 4);
+			buf += 4;
+			left -= 4;
+			continue;
+		}
+		memcpy(buf, &rnd, left);
+		break;
+	}
+}
 
 void wait_touch_ledflash(int ledvalue, int loopcount)
 {
@@ -54,7 +76,6 @@ touched:
 
 int main(void)
 {
-	uint32_t stack;
 	uint8_t pubkey[32];
 	struct frame_header hdr; // Used in both directions
 	uint8_t cmd[CMDLEN_MAXBYTES];
@@ -68,6 +89,9 @@ int main(void)
 	int nbytes = 0; // Bytes to write to memory
 	uint8_t in;
 	uint32_t local_cdi[8];
+
+	uint8_t mac[16];
+	uint8_t nonce[24];
 
 	wordcpy(local_cdi, (void *)cdi, 8);
 	crypto_ed25519_public_key(pubkey, (const uint8_t *)local_cdi);
@@ -114,7 +138,8 @@ int main(void)
 
 		case APP_CMD_SET_SIZE:
 			// Bad length
-			if (hdr.len != 32) {
+			if (hdr.len != 32)
+			{
 				rsp[0] = STATUS_BAD;
 				appreply(hdr, APP_RSP_SET_SIZE, rsp);
 				break;
@@ -122,10 +147,11 @@ int main(void)
 			signature_done = 0;
 			// cmd[1..4] contains the size.
 			message_size = cmd[1] + (cmd[2] << 8) + (cmd[3] << 16) +
-				       (cmd[4] << 24);
+						   (cmd[4] << 24);
 			led_steady = LED_RED;
 
-			if (message_size > MAX_SIGN_SIZE) {
+			if (message_size > MAX_SIGN_SIZE)
+			{
 				rsp[0] = STATUS_BAD;
 				appreply(hdr, APP_RSP_SET_SIZE, rsp);
 				break;
@@ -140,20 +166,25 @@ int main(void)
 			led_steady = LED_GREEN;
 			break;
 
-		case APP_CMD_SIGN_DATA: {
+		case APP_CMD_SIGN_DATA:
+		{
 			const uint32_t cmdBytelen = 128;
 
 			// Bad length of this command, or APP_CMD_SET_SIZE has
 			// not been called
-			if (hdr.len != cmdBytelen || message_size == 0) {
+			if (hdr.len != cmdBytelen || message_size == 0)
+			{
 				rsp[0] = STATUS_BAD;
 				appreply(hdr, APP_RSP_SIGN_DATA, rsp);
 				break;
 			}
 
-			if (left > (cmdBytelen - 1)) {
+			if (left > (cmdBytelen - 1))
+			{
 				nbytes = cmdBytelen - 1;
-			} else {
+			}
+			else
+			{
 				nbytes = left;
 			}
 
@@ -161,13 +192,14 @@ int main(void)
 			msg_idx += nbytes;
 			left -= nbytes;
 
-			if (left == 0) {
+			if (left == 0)
+			{
 				wait_touch_ledflash(LED_GREEN, 350000);
 				// All loaded, device touched, let's
 				// sign the message
 				crypto_ed25519_sign(signature,
-						    (void *)local_cdi, pubkey,
-						    sign_message, message_size);
+									(void *)local_cdi, pubkey,
+									sign_message, message_size);
 				signature_done = 1;
 				message_size = 0;
 			}
@@ -189,6 +221,29 @@ int main(void)
 			appreply(hdr, APP_RSP_GET_SIG, rsp);
 			led_steady = LED_GREEN;
 			break;
+
+		case APP_CMD_AEAD_ENCRYPT:
+		{
+			const uint32_t cmdBytelen = 128;
+
+			// Bad length of this command, or APP_CMD_SET_SIZE has
+			// not been called
+			if (hdr.len != cmdBytelen)
+			{
+				rsp[0] = STATUS_BAD;
+				appreply(hdr, APP_RSP_AEAD_ENCRYPT, rsp);
+				break;
+			}
+			memset(mac, 0, 16);
+			memset(nonce, 0, 24);
+			get_random(nonce, 24);
+
+			crypto_blake2b_general(mac, 16, (const uint8_t *)local_cdi, 32, (const uint8_t *)cmd + 1, 16 * 6 + 13);
+			crypto_lock(mac, rsp + 1, (const uint8_t *)local_cdi, nonce, (const uint8_t *)cmd + 1, 16 * 6 + 13);
+			rsp[0] = STATUS_OK;
+			memcpy(rsp + 1 + 16 * 6 + 13, mac, 16);
+			appreply(hdr, APP_RSP_AEAD_ENCRYPT, rsp);
+		}
 
 		default: // Unknown command
 			break;
