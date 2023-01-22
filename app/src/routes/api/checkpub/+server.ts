@@ -4,7 +4,7 @@ import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import { DATABASE_URL } from '$env/static/private';
 
-export const POST = (async ({ request }) => {
+export const POST = (async (request) => {
 	const DATABASEURL = DATABASE_URL;
 	const client = new Client(DATABASEURL); //process.env.DATABASE_URL
 	try {
@@ -13,7 +13,7 @@ export const POST = (async ({ request }) => {
 	} catch (e) {
 		throw error(500, 'Could not connect to database');
 	}
-	const data = await request.json();
+	const data = await request.request.json();
 	const query = {
 		// give the query a unique name
 		name: 'check-exists',
