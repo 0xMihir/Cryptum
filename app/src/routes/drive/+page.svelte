@@ -9,45 +9,6 @@
 	import { onMount } from "svelte";
     import { connection } from "$lib/stores/connection";
 
-    /*const root = INode.fromJson(`{
-        "type": "directory",
-        "name": "root",
-        "children": [
-            {
-                "type": "file",
-                "name": "hi.txt",
-                "uuid": "bleeeh"
-            },
-            {
-                "type": "directory",
-                "name": "people",
-                "children": [
-                    {
-                        "type": "file",
-                        "name": "bob ross.txt",
-                        "uuid": "86"
-                    },
-                    {
-                        "type": "directory",
-                        "name": "time",
-                        "children": [
-                        ]
-                    },
-                    {
-                        "type": "file",
-                        "name": "kanye west.txt",
-                        "uuid": "23"
-                    }
-                ]
-            },
-            {
-                "type": "file",
-                "name": "bruhv",
-                "uuid": "uuid2"
-            }
-        ]
-    }`) as Directory;*/
-
     // temp until server loads
     let root = new Directory("root");
 
@@ -168,7 +129,7 @@
     </div>
 </div>
 <div class="file-manager">
-    <FileManager rootDirectory={root} bind:this={fileManager}/>
+    <FileManager rootDirectory={root} bind:this={fileManager} on:foldersUpdated={updateRootOnServer}/>
 </div>
 
 <Confirmation header="Create Folder" confirmationStore={createFolderConfirm}>
