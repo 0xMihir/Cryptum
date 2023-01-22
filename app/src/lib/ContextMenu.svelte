@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import type { Directory, INode } from './directoryTree';
+	import { File } from './directoryTree';
 	const dispatch = createEventDispatcher();
 
 	export let currentDirectory: Directory;
@@ -16,6 +17,9 @@
 	async function removeNode() {
 		currentDirectory.removeChild(node.name);
 		dispatch("foldersUpdated");
+		if (node instanceof File) {
+			await node.deleteFromServer();
+		}
 	}
 </script>
 

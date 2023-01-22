@@ -7,6 +7,7 @@
 	import Confirmation from "$lib/confirm/Confirmation.svelte";
     import ErrorPopup from "$lib/ErrorPopup.svelte";
 	import { onMount } from "svelte";
+    import { connection } from "$lib/stores/connection";
 
     // temp until server loads
     let root = new Directory("root");
@@ -25,6 +26,9 @@
                 errorPopup.showError("could not retrieve files from server");
                 return;
             }
+
+            
+
 
             const inode = INode.fromJson(new TextDecoder().decode(data));
             if (inode != null && inode instanceof Directory) {
