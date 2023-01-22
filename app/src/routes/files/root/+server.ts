@@ -20,12 +20,8 @@ export async function GET(requestEvent: RequestEvent): Promise<Response> {
 	const rootData = await getObject(uuid);
 
 	if (rootData == null) {
-		// root data not yet created, return empty root
-		return new Response(`{
-			"type": "directory",
-			"name": "root",
-			"children": []
-		}`);
+		// root data not yet created
+		throw error(404, "the root has not been created yet");
 	} else {
 		return new Response(rootData);
 	}

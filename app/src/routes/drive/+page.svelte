@@ -21,9 +21,16 @@
             const res = await fetch("/files/root", {
                 method: "GET",
             });
-            const data = new Uint8Array(await res.arrayBuffer());
 
-            const inode = INode.fromJson(new TextDecoder().decode(data));
+            let inode;
+
+            if (res.ok) {
+                const data = new Uint8Array(await res.arrayBuffer());
+                inode = INode.fromJson(new TextDecoder().decode(data));
+            } else {
+                inode = new Directory("root");
+            }
+
             if (inode != null && inode instanceof Directory) {
                 fileManager.setRootDirectory(inode);
                 root = inode;
