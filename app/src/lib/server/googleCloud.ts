@@ -3,7 +3,7 @@ import { Storage } from '@google-cloud/storage';
 import { Stream } from 'stream';
 
 // returns null if file doesn't exist
-export async function getObject(name: string): Promise<string | null> {
+export async function getObject(name: string): Promise<Uint8Array | null> {
 	const storage = new Storage({
 		projectId: 'cryptum',
 		keyFilename: 'gc_keyfile/cryptum-cc63e7b7ac73.json'
@@ -14,7 +14,7 @@ export async function getObject(name: string): Promise<string | null> {
 	async function streamFile() {
 		// Downloads the file into a buffer in memory.
 		const contents = await bucket.file(name).download();
-		return contents.toString();
+		return new Uint8Array(contents[0]);
 	}
 
 	try {

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import ErrorPopup from './ErrorPopup.svelte';
     import { createEventDispatcher } from 'svelte';
     import { Breadcrumb, BreadcrumbItem } from 'sveltestrap';
 	import { Directory, INode, File } from "./directoryTree";
@@ -9,6 +10,8 @@
     export let rootDirectory: Directory;
 
     let directoryStack = [rootDirectory];
+
+    let errorPopup: ErrorPopup;
 
     // this is kind of a hack to get around some wierd stuff with reactivity
     // need to call this everytim root directory changes
@@ -32,12 +35,28 @@
         }
     }
 
-    function openFile(event: CustomEvent) {
+    async function openFile(event: CustomEvent) {
         const file = event.detail;
 
         if (file instanceof Directory) {
             directoryStack = [...directoryStack, file];
         } else if (file instanceof File) {
+            try {
+                const fileData = await fetch("/files/" + file.uuid, {
+                    method: "GET",
+                });
+
+                const fileBlob = await fileData.blob();
+                const url = window.URL.createObjectURL(fileBlob);
+
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = file.name;
+                link.click();
+            } catch (e) {
+                errorPopup.showError("failed to download file");
+            }
+            
             const link = document.createElement("a");
             link.href = "/files/" + file.uuid;
             link.download = file.name;
@@ -69,6 +88,8 @@
 </div>
 
 <DirectoryView directory={directoryStack[directoryStack.length - 1]} on:fileOpened={openFile} on:foldersUpdated={foldersUpdated}/>
+
+<ErrorPopup bind:this={errorPopup}/>
 
 <style>
     .top-bar {

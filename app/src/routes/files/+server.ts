@@ -10,11 +10,13 @@ export async function POST(request: RequestEvent): Promise<Response> {
 	const pubKey = pubKeyFromJwt(request);
 	const uuid = randomUUID();
 
-	const data = (await request?.request?.body?.getReader().read())?.value;
-	if (data == null) {
+	let data;
+	try {
+		data = new Uint8Array(await request.request.arrayBuffer());
+	} catch (e) {
 		throw error(400, "no data sent for file");
 	}
-
+	
 	await createObject(pubKey + ":" + uuid, data);
 
 	return new Response(uuid);

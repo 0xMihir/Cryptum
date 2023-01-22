@@ -35,8 +35,10 @@ export async function GET(requestEvent: RequestEvent): Promise<Response> {
 export async function POST(requestEvent: RequestEvent): Promise<Response> {
 	const uuid = await getUserRootUuid(requestEvent);
 
-	const data = (await requestEvent?.request?.body?.getReader().read())?.value;
-	if (data == null) {
+	let data;
+	try {
+		data = new Uint8Array(await requestEvent.request.arrayBuffer());
+	} catch (e) {
 		throw error(400, "no data sent for root");
 	}
 
