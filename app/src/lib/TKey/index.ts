@@ -276,9 +276,9 @@ class TkeyConnection {
 
 		const encryptOutput = new Uint8Array((127 * data.length) / 86);
 
-		console.log(input.byteLength, length)
-		console.log(data.byteLength)
-		console.log(encryptOutput.byteLength)
+		console.log(input.byteLength, length);
+		console.log(data.byteLength);
+		console.log(encryptOutput.byteLength);
 		let ei = 0;
 		for (let pi = 0; pi < data.length; pi += 86) {
 			const encrypted = await this.encryptData(data.slice(pi, pi + 86));
@@ -329,7 +329,7 @@ class TkeyConnection {
 		}
 
 		const length =
-		decryptOutput[0] |
+			decryptOutput[0] |
 			(decryptOutput[1] << 8) |
 			(decryptOutput[2] << 16) |
 			(decryptOutput[3] << 24) |
@@ -337,7 +337,7 @@ class TkeyConnection {
 			(decryptOutput[5] << 40) |
 			(decryptOutput[6] << 48) |
 			(decryptOutput[7] << 56);
-			
+
 		return decryptOutput.slice(8, 8 + length);
 	}
 

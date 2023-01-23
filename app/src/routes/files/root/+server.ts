@@ -10,7 +10,7 @@ async function getUserRootUuid(requestEvent: RequestEvent): Promise<string> {
 	if (uuid != null) {
 		return uuid;
 	} else {
-		throw error(400, "not logged in");
+		throw error(400, 'not logged in');
 	}
 }
 
@@ -21,7 +21,7 @@ export async function GET(requestEvent: RequestEvent): Promise<Response> {
 
 	if (rootData == null) {
 		// root data not yet created
-		throw error(404, "the root has not been created yet");
+		throw error(404, 'the root has not been created yet');
 	} else {
 		return new Response(rootData);
 	}
@@ -35,7 +35,7 @@ export async function POST(requestEvent: RequestEvent): Promise<Response> {
 	try {
 		data = new Uint8Array(await requestEvent.request.arrayBuffer());
 	} catch (e) {
-		throw error(400, "no data sent for root");
+		throw error(400, 'no data sent for root');
 	}
 
 	await createObject(uuid, data);

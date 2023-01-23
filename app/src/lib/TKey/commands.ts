@@ -7,7 +7,7 @@ export enum CommandLength {
 
 export enum CommandStatus {
 	Success = 0,
-	Failure = 1,
+	Failure = 1
 }
 
 export const cmdByteLength = (len: CommandLength) => {
@@ -37,11 +37,11 @@ const makeFirmwareCommand = (commandCode: number, commandLength: CommandLength) 
 };
 
 const makeApplicationCommand = (commandCode: number, commandLength: CommandLength) => {
-    return {
-        commandCode,
-        commandLength,
-        commandEndpoint: CommandEndpoint.App
-    };
+	return {
+		commandCode,
+		commandLength,
+		commandEndpoint: CommandEndpoint.App
+	};
 };
 
 export interface Command {
@@ -75,7 +75,6 @@ const cmdAEADEncrypt = makeApplicationCommand(0x0b, CommandLength.CommandLen128)
 const rspAEADEncrypt = makeApplicationCommand(0x0c, CommandLength.CommandLen128);
 const cmdAEADDecrypt = makeApplicationCommand(0x0d, CommandLength.CommandLen128);
 const rspAEADDecrypt = makeApplicationCommand(0x0e, CommandLength.CommandLen128);
-
 
 export default {
 	firmwareCommands: {

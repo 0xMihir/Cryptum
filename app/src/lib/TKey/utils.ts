@@ -38,23 +38,23 @@ export const hexdump = (buffer: string | ArrayBuffer | Uint8Array, blockSize?: n
 };
 
 export const toHex = (buffer: Uint8Array) => {
-    let hex = "";
-    for (let i = 0; i < buffer.byteLength; i++) {
-        hex += ("0" + buffer[i].toString(16)).slice(-2);
-    }
-    return hex;
-}
+	let hex = '';
+	for (let i = 0; i < buffer.byteLength; i++) {
+		hex += ('0' + buffer[i].toString(16)).slice(-2);
+	}
+	return hex;
+};
 
 export const fromHex = (hex: string) => {
-    const buffer = new Uint8Array(hex.length / 2);
-    for (let i = 0; i < hex.length; i += 2) {
-        buffer[i / 2] = parseInt(hex.slice(i, i + 2), 16);
-    }
-    return buffer;
-}
+	const buffer = new Uint8Array(hex.length / 2);
+	for (let i = 0; i < hex.length; i += 2) {
+		buffer[i / 2] = parseInt(hex.slice(i, i + 2), 16);
+	}
+	return buffer;
+};
 
 export default {
-    hexdump,
-    toHex,
-    fromHex
-}
+	hexdump,
+	toHex,
+	fromHex
+};

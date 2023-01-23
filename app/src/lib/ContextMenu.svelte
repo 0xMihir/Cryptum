@@ -12,20 +12,20 @@
 	export let node: INode;
 	export let x: Number;
 	export let y: Number;
-	$: menuStyle = "position: absolute; top: " + y.toString() + "px; left: " + x.toString() + "px;";
+	$: menuStyle = 'position: absolute; top: ' + y.toString() + 'px; left: ' + x.toString() + 'px;';
 
 	let delayCloseMenu = false;
 
 	const renameConfirm = newConfirm();
-	let renameName = "";
+	let renameName = '';
 	function renameNode() {
 		delayCloseMenu = true;
 
 		renameName = node.name;
-		renameConfirm.confirm(async confirmed => {
+		renameConfirm.confirm(async (confirmed) => {
 			if (confirmed) {
 				if (currentDirectory.hasFile(renameName)) {
-					return ConfirmError("this directory already contains a file with that name");
+					return ConfirmError('this directory already contains a file with that name');
 				}
 
 				currentDirectory.removeChildInode(node);
@@ -38,20 +38,20 @@
 					delayCloseMenu = false;
 				}, 500);
 
-				dispatch("foldersUpdated");
+				dispatch('foldersUpdated');
 				return ConfirmOk;
 			} else {
 				dispatch('closemenu');
 				delayCloseMenu = false;
 				return ConfirmOk;
 			}
-		})
+		});
 	}
 
 	interface Option {
-        name: string,
-        value: any,
-    }
+		name: string;
+		value: any;
+	}
 	const moveConfirm = newConfirm();
 	let moveToOptions: Option[] = [];
 	let selectedLocation: Directory | null = null;
@@ -64,26 +64,26 @@
 			if (child instanceof Directory) {
 				moveToOptions.push({
 					name: key,
-					value: child,
+					value: child
 				});
 			}
 		}
-		
+
 		if (currentDirectory.parent != null) {
 			moveToOptions.push({
-				name: currentDirectory.parent.name + " (Parent)",
-				value: currentDirectory.parent,
+				name: currentDirectory.parent.name + ' (Parent)',
+				value: currentDirectory.parent
 			});
 		}
 
-		moveConfirm.confirm(async confirmed => {
+		moveConfirm.confirm(async (confirmed) => {
 			if (confirmed) {
 				if (selectedLocation == null) {
-					return ConfirmError("please select a directory to move to");
+					return ConfirmError('please select a directory to move to');
 				}
 
 				if (selectedLocation.hasFile(node.name)) {
-					return ConfirmError("that directory already contains a file with the same name");
+					return ConfirmError('that directory already contains a file with the same name');
 				}
 
 				currentDirectory.removeChildInode(node);
@@ -95,7 +95,7 @@
 					delayCloseMenu = false;
 				}, 500);
 
-				dispatch("foldersUpdated");
+				dispatch('foldersUpdated');
 				return ConfirmOk;
 			} else {
 				dispatch('closemenu');
@@ -107,14 +107,14 @@
 
 	async function removeNode() {
 		currentDirectory.removeChild(node.name);
-		dispatch("foldersUpdated");
+		dispatch('foldersUpdated');
 		if (node instanceof File) {
 			await node.deleteFromServer();
 		}
 	}
 </script>
 
-<div class="menu" style={menuStyle} >
+<div class="menu" style={menuStyle}>
 	<div class="option-container">
 		<button on:click={renameNode} class="option">Rename File</button>
 		<button on:click={moveNode} class="option">Move File</button>
@@ -125,22 +125,24 @@
 <Confirmation header="Rename File" confirmationStore={renameConfirm}>
 	<FormGroup>
 		<Label for="newName">Enter New Filename</Label>
-		<input id="newName" type="text" class="form-control" bind:value={renameName}/>
+		<input id="newName" type="text" class="form-control" bind:value={renameName} />
 	</FormGroup>
 </Confirmation>
 
 <Confirmation header="Move File" confirmationStore={moveConfirm}>
 	<FormGroup>
 		<Label for="destination">Select Destination</Label>
-		<SearchSelect id="destination" bind:value={selectedLocation} options={moveToOptions}/>
+		<SearchSelect id="destination" bind:value={selectedLocation} options={moveToOptions} />
 	</FormGroup>
 </Confirmation>
 
-<svelte:window on:click={() => {
-	if (!delayCloseMenu) {
-		dispatch('closemenu');
-	}
-}}/>
+<svelte:window
+	on:click={() => {
+		if (!delayCloseMenu) {
+			dispatch('closemenu');
+		}
+	}}
+/>
 
 <style>
 	.option-container {
@@ -159,5 +161,4 @@
 	.option:hover {
 		background-color: lightgrey;
 	}
-	
 </style>

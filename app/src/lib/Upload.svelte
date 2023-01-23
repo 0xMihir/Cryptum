@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { createEventDispatcher } from "svelte";
-	import { File } from "./directoryTree";
-	import ErrorPopup from "./ErrorPopup.svelte";
+	import { createEventDispatcher } from 'svelte';
+	import { File } from './directoryTree';
+	import ErrorPopup from './ErrorPopup.svelte';
 
 	const eventDispatcher = createEventDispatcher();
 
@@ -24,12 +24,12 @@
 		reader.onload = (e) => {
 			contents = e.target?.result;
 			if (contents == null || contents == undefined) {
-				errorPopup.showError("Could not read file");
+				errorPopup.showError('Could not read file');
 				return;
 			}
-			eventDispatcher("fileUploaded", {
+			eventDispatcher('fileUploaded', {
 				name: file.name,
-				data: contents,
+				data: contents
 			});
 		};
 	}
@@ -37,10 +37,12 @@
 
 <div class="uploadContainer">
 	<input class="hidden" type="file" on:change={(e) => readFile(e)} bind:this={fileInput} />
-	<button class="btn btn-primary upload-button" on:click={() => fileInput.click()}>Upload File</button>
+	<button class="btn btn-primary upload-button" on:click={() => fileInput.click()}
+		>Upload File</button
+	>
 </div>
 
-<ErrorPopup bind:this={errorPopup}/>
+<ErrorPopup bind:this={errorPopup} />
 
 <style>
 	.hidden {

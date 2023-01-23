@@ -14,10 +14,10 @@ export async function POST(request: RequestEvent): Promise<Response> {
 	try {
 		data = new Uint8Array(await request.request.arrayBuffer());
 	} catch (e) {
-		throw error(400, "no data sent for file");
+		throw error(400, 'no data sent for file');
 	}
-	
-	await createObject(pubKey + ":" + uuid, data);
+
+	await createObject(pubKey + ':' + uuid, data);
 
 	return new Response(uuid);
 }

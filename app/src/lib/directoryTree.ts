@@ -35,10 +35,10 @@ export class INode {
 
 		try {
 			const jsonData = JSON.parse(json);
-			return parseInode(jsonData)
+			return parseInode(jsonData);
 		} catch (e) {
-            return null;
-        }
+			return null;
+		}
 	}
 
 	toString(): string {
@@ -51,8 +51,8 @@ export class INode {
 }
 
 export interface NewFile {
-	name: string,
-	data: ArrayBuffer,
+	name: string;
+	data: ArrayBuffer;
 }
 
 export class File extends INode {
@@ -73,8 +73,8 @@ export class File extends INode {
 	}
 
 	async deleteFromServer() {
-		await fetch("/files/" + this.uuid, {
-			method: "DELETE",
+		await fetch('/files/' + this.uuid, {
+			method: 'DELETE'
 		});
 	}
 }

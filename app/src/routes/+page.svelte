@@ -1,20 +1,18 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Login from '../lib/Login.svelte';
-	import "@fontsource/roboto";
-	import "@fontsource/varela-round";
+	import '@fontsource/roboto';
+	import '@fontsource/varela-round';
 </script>
-<video id="background-video"
-	src="/videos/landing-page-bg.mp4"
-	autoplay muted
-	>
-	<track kind="captions">
+
+<video id="background-video" src="/videos/landing-page-bg.mp4" autoplay muted>
+	<track kind="captions" />
 </video>
 
 <div class="center">
 	<div class="items">
 		<div class="title-container">
-			<img class="logo" src="/logo.png" alt="logo"/>
+			<img class="logo" src="/logo.png" alt="logo" />
 			<h1>Cryptum</h1>
 		</div>
 
@@ -23,7 +21,6 @@
 		<Login />
 	</div>
 </div>
-
 
 <style>
 	.title-container {
@@ -50,7 +47,7 @@
 
 		font-weight: 200;
 		font-family: 'Varela Round';
-		background-image: linear-gradient(to left, #FF0790, #2300FF);
+		background-image: linear-gradient(to left, #ff0790, #2300ff);
 		color: transparent;
 		background-clip: text;
 		-webkit-background-clip: text;
@@ -69,7 +66,7 @@
 		align-items: center;
 	}
 
-		#background-video {
+	#background-video {
 		width: 100vw;
 		height: 100vh;
 		object-fit: cover;
@@ -79,5 +76,5 @@
 		bottom: 0;
 		z-index: -1;
 		position: fixed;
-		}
+	}
 </style>

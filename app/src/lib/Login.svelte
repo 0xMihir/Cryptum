@@ -2,8 +2,8 @@
 	import { goto } from '$app/navigation';
 	import { fromHex, toHex, hexdump } from './TKey/utils';
 	import { connection } from './stores/connection';
-    import tk from '$lib/TKey';
-	import "@fontsource/roboto";
+	import tk from '$lib/TKey';
+	import '@fontsource/roboto';
 
 	async function doesUserExist(pubKey: string) {
 		const response = await fetch('/api/checkpub', {
@@ -61,11 +61,11 @@
 		const blob = await appBin.blob();
 
 		const appBuffer = new Uint8Array(await blob.arrayBuffer());
-		
+
 		const conn = await tk.TkeyConnection.connect(port);
 		connection.set(conn);
 
-		const successfulLoad = await conn.loadBinary(appBuffer);		
+		const successfulLoad = await conn.loadBinary(appBuffer);
 
 		if (!successfulLoad) {
 			console.log('Failed to load binary');
@@ -79,10 +79,10 @@
 		const pubKey = toHex(publicKey);
 		console.log(pubKey);
 
-        const { nonce } = await getNonce(); 
+		const { nonce } = await getNonce();
 
 		const signed = await conn.signData(fromHex(nonce));
-		const sig = toHex(signed);		
+		const sig = toHex(signed);
 
 		await fetch('/api/login', {
 			method: 'POST',
@@ -94,37 +94,36 @@
 
 		const data = await doesUserExist(pubKey);
 		const name = await getName(pubKey);
-		if (data["exists"]){
+		if (data['exists']) {
 			setCookie('name', name);
-			goto('/drive')
+			goto('/drive');
 		} else {
-			goto('/create')
+			goto('/create');
 		}
-		
+
 		console.log(data);
 		console.log(name);
 	};
 	/*
-	* General utils for managing cookies in Typescript.
-	*/
+	 * General utils for managing cookies in Typescript.
+	 */
 	function setCookie(name: string, val: string) {
 		const date = new Date();
 		const value = val;
 
 		// Set it expire in 7 days
-		date.setTime(date.getTime() + (7 * 24 * 60 * 60 * 1000));
+		date.setTime(date.getTime() + 7 * 24 * 60 * 60 * 1000);
 
 		// Set it
-		document.cookie = name+"="+value+"; expires="+date.toUTCString()+"; path=/";
+		document.cookie = name + '=' + value + '; expires=' + date.toUTCString() + '; path=/';
 	}
 </script>
 
 <button on:click={login}>Login</button>
 
-
 <style>
 	button {
-		background-image: linear-gradient(to left, #FF0790, #2300FF); /* Green */
+		background-image: linear-gradient(to left, #ff0790, #2300ff); /* Green */
 		border: none;
 		font-family: 'Roboto', sans-serif;
 		color: white;
