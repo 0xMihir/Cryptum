@@ -12,7 +12,7 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "^1.0.0",
+		"@sveltejs/adapter-node": "^1.0.0",
 		"@sveltejs/kit": "^1.0.0",
 		"@types/jsonwebtoken": "^9.0.1",
 		"@types/pg": "^8.6.6",
@@ -32,7 +32,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@esbuild/linux-x64": "^0.17.3",
 		"@fontsource/roboto": "^4.5.8",
 		"@fontsource/varela-round": "^4.5.9",
 		"@google-cloud/storage": "^6.9.0",

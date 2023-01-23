@@ -5,7 +5,7 @@
 	import "@fontsource/varela-round";
 </script>
 <video id="background-video"
-	src="../static/videos/landing-page-bg.mp4"
+	src="/videos/landing-page-bg.mp4"
 	autoplay muted
 	>
 	<track kind="captions">
