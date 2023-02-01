@@ -1,12 +1,13 @@
 import { error } from '@sveltejs/kit';
 import { Storage } from '@google-cloud/storage';
 import { Stream } from 'stream';
+import { GC_KEYFILE } from '$env/static/private';
 
 // returns null if file doesn't exist
 export async function getObject(name: string): Promise<Uint8Array | null> {
 	const storage = new Storage({
 		projectId: 'cryptum',
-		keyFilename: 'gc_keyfile/cryptum-cc63e7b7ac73.json'
+		keyFilename: GC_KEYFILE
 	});
 
 	const bucket = storage.bucket('cryptum-storage');
@@ -27,7 +28,7 @@ export async function getObject(name: string): Promise<Uint8Array | null> {
 export async function createObject(name: string, data: Uint8Array) {
 	const storage = new Storage({
 		projectId: 'cryptum',
-		keyFilename: 'gc_keyfile/cryptum-cc63e7b7ac73.json'
+		keyFilename: GC_KEYFILE
 	});
 
 	const bucket = storage.bucket('cryptum-storage');
@@ -49,7 +50,7 @@ export async function createObject(name: string, data: Uint8Array) {
 export async function deleteObject(name: string) {
 	const storage = new Storage({
 		projectId: 'cryptum',
-		keyFilename: 'gc_keyfile/cryptum-cc63e7b7ac73.json'
+		keyFilename: GC_KEYFILE
 	});
 
 	const bucket = storage.bucket('cryptum-storage');
