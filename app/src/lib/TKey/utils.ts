@@ -29,7 +29,8 @@ export const hexdump = (buffer: string | ArrayBuffer | Uint8Array, blockSize?: n
 			})
 			.join('');
 		codes += '	'.repeat(blockSize - block.length);
-		let chars = block.replace(/[\u00-\u1F\x20]/g, '.');
+		// eslint-disable-next-line no-control-regex
+		let chars = block.replace(/[\x00-\x1F\x20]/g, '.');
 		chars += ' '.repeat(blockSize - block.length);
 		//		lines.push(addr + " " + codes + "  " + chars);				//old code
 		lines.push(codes + '  //' + chars + '	' + addr); //new code

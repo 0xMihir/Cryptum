@@ -74,6 +74,7 @@ class TkeyConnection {
 	private port: SerialPort;
 	private reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
 	private writer: WritableStreamDefaultWriter<Uint8Array> | null = null;
+	private open = false;
 
 	private readTimeout = 1000;
 
@@ -88,6 +89,8 @@ class TkeyConnection {
 		if (!port.writable) throw new Error('Serial port is not writable');
 		connection.writer = port.writable.getWriter();
 
+		connection.open = true;
+
 		return connection;
 	}
 
@@ -96,7 +99,12 @@ class TkeyConnection {
 		await this.writer.write(data);
 	}
 
-	public async readFrame(expectedCommand: Command, expectedID?: number): Promise<Uint8Array> {
+	public async readFrame(
+		expectedCommand: Command,
+		expectedID?: number,
+		timeout = true
+	): Promise<Uint8Array> {
+		if (!this.reader) throw new Error('Serial port is not readable');
 		expectedID = expectedID || 2;
 		if (expectedCommand.commandEndpoint > 3)
 			throw new Error('Command endpoint must be between 0 and 3');
@@ -107,21 +115,49 @@ class TkeyConnection {
 		let buffer = makeBuffer(expectedCommand, expectedID);
 		let offset = 0;
 
-		const start = Date.now();
-		// while (Date.now() - start < this.readTimeout) {
-		while (true) {
-			if (offset >= buffer.length) {
-				break;
-			}
+		if (timeout) {
+			// eslint-disable-next-line no-constant-condition
+			while (true) {
+				if (offset >= buffer.length) {
+					break;
+				}
+				const timer = setTimeout(() => {
+					this.reader?.releaseLock();
+					console.log('Timeout');
+					if (this.port.readable) {
+						this.reader = this.port.readable.getReader();
+					}
+				}, this.readTimeout);
 
-			const { value, done } = await this.reader.read();
-			if (done) {
-				break;
-			}
+				const { value, done } = await this.reader.read();
+				clearTimeout(timer);
 
-			if (value) {
-				buffer.set(value, offset);
-				offset += value.length;
+				if (done) {
+					break;
+				}
+
+				if (value) {
+					buffer.set(value, offset);
+					offset += value.length;
+				}
+			}
+		} else {
+			// eslint-disable-next-line no-constant-condition
+			while (true) {
+				if (offset >= buffer.length) {
+					break;
+				}
+
+				const { value, done } = await this.reader.read();
+
+				if (done) {
+					break;
+				}
+
+				if (value) {
+					buffer.set(value, offset);
+					offset += value.length;
+				}
 			}
 		}
 
@@ -153,14 +189,13 @@ class TkeyConnection {
 		const localDigest = blake2s(app);
 
 		await this.writeFrame(loadAppCmd);
-
 		await this.readFrame(commands.firmwareCommands.rspLoadApp);
 
 		let offset = 0;
-
+		if (!this.reader) throw new Error('Serial port is not readable');
 		while (offset + 127 < app.byteLength) {
 			const chunk = app.slice(offset, offset + 127);
-			const cmd = loadAppData(chunk);
+			const cmd = loadAppData(chunk);		
 			await this.writeFrame(cmd);
 			offset += 127;
 			await this.readFrame(commands.firmwareCommands.rspLoadAppData);
@@ -200,8 +235,6 @@ class TkeyConnection {
 		sizeCmd[4] = data.byteLength >> 16;
 		sizeCmd[5] = data.byteLength >> 24;
 
-		console.log('sizeCmd', hexdump(sizeCmd));
-
 		await this.writeFrame(sizeCmd);
 
 		const sizeRsp = await this.readFrame(commands.appCommands.rspSetSize);
@@ -228,18 +261,17 @@ class TkeyConnection {
 		const lastSignCmd = makeBuffer(commands.appCommands.cmdSignData);
 		lastSignCmd.set(lastChunk, 2);
 		await this.writeFrame(lastSignCmd);
-		const signDataResp = await this.readFrame(commands.appCommands.rspSignData);
+		const signDataResp = await this.readFrame(commands.appCommands.rspSignData, 2, false);
 		if (signDataResp[2] !== CommandStatus.Success) {
 			throw new Error('Failed to sign data');
 		}
 
 		const getSigCmd = makeBuffer(commands.appCommands.cmdGetSignature);
 		await this.writeFrame(getSigCmd);
-		const getSigResp = await this.readFrame(commands.appCommands.rspGetSignature);
+		const getSigResp = await this.readFrame(commands.appCommands.rspGetSignature, 2, false);
 		if (getSigResp[2] !== CommandStatus.Success) {
 			throw new Error('Failed to get signature');
 		}
-		console.log(getSigResp);
 
 		return getSigResp.slice(3, 3 + 64);
 	}
@@ -276,13 +308,9 @@ class TkeyConnection {
 
 		const encryptOutput = new Uint8Array((127 * data.length) / 86);
 
-		console.log(input.byteLength, length);
-		console.log(data.byteLength);
-		console.log(encryptOutput.byteLength);
 		let ei = 0;
 		for (let pi = 0; pi < data.length; pi += 86) {
 			const encrypted = await this.encryptData(data.slice(pi, pi + 86));
-			console.log(ei);
 			encryptOutput.set(encrypted, ei);
 			ei += 127;
 		}
@@ -306,11 +334,7 @@ class TkeyConnection {
 	public async getNameVersion(): Promise<Uint8Array> {
 		const cmd = makeBuffer(commands.appCommands.cmdGetNameVersion);
 		await this.writeFrame(cmd);
-		const resp: any = await Promise.race([
-			this.readFrame(commands.appCommands.rspGetNameVersion),
-			new Promise((_r, rej) => setTimeout(() => rej('p2'), 500))
-		]);
-
+		const resp = await this.readFrame(commands.appCommands.rspGetNameVersion);
 		return resp.slice(2);
 	}
 
@@ -324,7 +348,7 @@ class TkeyConnection {
 		let di = 0;
 		for (let ei = 0; ei < data.length; ei += 127) {
 			const decrypted = await this.decryptData(data.slice(ei, ei + 127));
-			decryptOutput.set(decrypted, di);
+			decryptOutput.set(decrypted.slice(1), di);
 			di += 86;
 		}
 
@@ -341,7 +365,12 @@ class TkeyConnection {
 		return decryptOutput.slice(8, 8 + length);
 	}
 
+	public isOpen(): boolean {
+		return this.open;
+	}
+
 	public async close(): Promise<void> {
+		this.open = false;
 		if (this.reader) {
 			await this.reader.cancel();
 		}
@@ -363,9 +392,6 @@ class TkeyConnection {
 }
 
 export default {
-	makeBuffer,
-	loadApp,
-	loadAppData,
 	commands,
 	TkeyConnection
 };

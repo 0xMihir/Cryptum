@@ -20,6 +20,9 @@
 
 	async function getRootFromServer() {
 		try {
+			const nameVersion = new TextDecoder().decode((await conn.getNameVersion()).slice(0,7));
+			if (nameVersion !== "cryptum") 
+				return errorPopup.showError('TKey not running cryptum firmware');
 			const res = await fetch('/files/root', {
 				method: 'GET'
 			});
@@ -37,11 +40,11 @@
 				fileManager.setRootDirectory(inode);
 				root = inode;
 			} else {
-				errorPopup.showError('invalid folder structure recieved from server');
+				errorPopup.showError('Invalid folder structure recieved from server');
 			}
 		} catch (e) {
 			console.log(e);
-			errorPopup.showError('could not retrieve files from server');
+			errorPopup.showError('Could not retrieve files from server');
 		}
 	}
 
@@ -54,7 +57,8 @@
 		try {
 			const res = await fetch('/files/root', {
 				method: 'POST',
-				body: await conn.encrypt(rootJson)
+				body: await conn.encrypt(rootJson),
+				headers: { 'content-type': 'application/octet-stream' }
 			});
 			if (!res.ok) {
 				return false;
@@ -67,7 +71,7 @@
 
 	async function addFile(newFile: NewFile) {
 		if (fileManager.currentDirectory().hasFile(newFile.name)) {
-			errorPopup.showError('could not add file, a file or folder with the name already exists');
+			errorPopup.showError('Could not add file, a file or folder with the name already exists');
 			return;
 		}
 
@@ -83,17 +87,17 @@
 				const file = new File(newFile.name, new TextDecoder().decode(body));
 				fileManager.addFile(file);
 			} else {
-				errorPopup.showError('could not upload file to server');
+				errorPopup.showError('Could not upload file to server');
 				return;
 			}
 		} catch (e) {
-			errorPopup.showError('could not upload file to server');
+			errorPopup.showError('Could not upload file to server');
 			return;
 		}
 
 		if (!(await updateRootOnServer())) {
 			fileManager.currentDirectory().removeChild(newFile.name);
-			errorPopup.showError('could not synchronize folder structure with server');
+			errorPopup.showError('Could not synchronize folder structure with server');
 		}
 	}
 
@@ -103,16 +107,16 @@
 		createFolderConfirm.confirm(async (confirmed) => {
 			if (confirmed) {
 				if (folderName.trim() == '') {
-					return ConfirmError('please enter a non empty folder name');
+					return ConfirmError('Please enter a non empty folder name');
 				}
 				const folder = new Directory(folderName);
 				if (!fileManager.addFile(folder)) {
-					return ConfirmError('a file or folder with that name already exists');
+					return ConfirmError('A file or folder with that name already exists');
 				}
 
 				if (!(await updateRootOnServer())) {
 					fileManager.currentDirectory().removeChild(folder.name);
-					return ConfirmError('could not synchronize folder structure with server');
+					return ConfirmError('Could not synchronize folder structure with server');
 				}
 			}
 			return ConfirmOk;

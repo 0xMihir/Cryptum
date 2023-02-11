@@ -17,12 +17,12 @@ export const POST = (async ({ request }) => {
 	const query = {
 		// give the query a unique name
 		name: 'fetch-user',
-		text: 'SELECT * FROM users WHERE pubkey = $1',
+		text: 'SELECT * FROM users WHERE pubkey = $1 LIMIT 1',
 		values: [data.pubKey]
 	};
-	const results = await (await client.query(query)).rows;
+	const results = (await client.query(query)).rows;
 	if (results.length > 0) {
-		return new Response(JSON.stringify({ exists: true, results: results }));
+		return new Response(JSON.stringify({ exists: true, results: results[0] }));
 	} else {
 		return new Response(JSON.stringify({ exists: false }));
 	}

@@ -96,6 +96,10 @@ int main(void)
 	uint8_t mac[MAC_SIZE];
 	uint8_t nonce[NONCE_SIZE];
 
+	blake2s_ctx b2_ctx;
+
+	uint8_t encrypt_progress = 0;
+
 	wordcpy(local_cdi, (void *)cdi, 8);
 	crypto_ed25519_public_key(pubkey, (const uint8_t *)local_cdi);
 
@@ -126,12 +130,9 @@ int main(void)
 		switch (cmd[0])
 		{
 		case APP_CMD_GET_NAMEVERSION:
-			if (hdr.len == 1)
-			{
-				memcpy(rsp, app_name0, 4);
-				memcpy(rsp + 4, app_name1, 4);
-				memcpy(rsp + 8, &app_version, 4);
-			}
+			memcpy(rsp, app_name0, 4);
+			memcpy(rsp + 4, app_name1, 4);
+			memcpy(rsp + 8, &app_version, 4);
 			appreply(hdr, APP_RSP_GET_NAMEVERSION, rsp);
 			break;
 		case APP_CMD_GET_PUBKEY:
@@ -237,12 +238,20 @@ int main(void)
 				appreply(hdr, APP_RSP_AEAD_ENCRYPT, rsp);
 				break;
 			}
+			if (encrypt_progress += 2 > 127)
+			{
+				led_steady = LED_BLUE + LED_GREEN + LED_RED;
+			}
+			else
+			{
+				led_steady = LED_RED + LED_BLUE;
+			}
 			memset(mac, 0, MAC_SIZE);
 			memset(nonce, 0, NONCE_SIZE);
 			get_random(nonce, NONCE_SIZE);
 
-			crypto_blake2b_general(mac, MAC_SIZE, (const uint8_t *)local_cdi, 32,
-								   (const uint8_t *)cmd + 1, MESSAGE_SIZE);
+			blake2s(mac,MAC_SIZE, (const uint8_t *)local_cdi, 32,
+								   (const uint8_t *)cmd + 1, MESSAGE_SIZE, &b2_ctx);
 			crypto_lock(mac, rsp + 1, (const uint8_t *)local_cdi, nonce, (const uint8_t *)cmd + 1, MESSAGE_SIZE);
 			memcpy(rsp + 1 + MESSAGE_SIZE, nonce, NONCE_SIZE);
 			memcpy(rsp + 1 + MESSAGE_SIZE + NONCE_SIZE, mac, MAC_SIZE);
@@ -263,12 +272,20 @@ int main(void)
 				appreply(hdr, APP_RSP_AEAD_DECRYPT, rsp);
 				break;
 			}
+			if (encrypt_progress += 2 > 127)
+			{
+				led_steady = LED_BLUE + LED_GREEN + LED_RED;
+			}
+			else
+			{
+				led_steady = LED_GREEN + LED_BLUE;
+			}
 
 			int success = crypto_unlock(rsp + 1,
 										(const uint8_t *)local_cdi,
-										cmd + 1 + MESSAGE_SIZE, // nonce
+										cmd + 1 + MESSAGE_SIZE,				 // nonce
 										cmd + 1 + MESSAGE_SIZE + NONCE_SIZE, // mac
-										cmd + 1, // ciphertext
+										cmd + 1,							 // ciphertext
 										MESSAGE_SIZE);
 
 			if (success == 0)

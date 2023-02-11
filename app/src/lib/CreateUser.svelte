@@ -12,10 +12,9 @@
 	});
 	//validate the public key somehow
 	if (!pubKey) {
-		error(500, 'No valid public key found');
+		error(400, 'No valid public key found');
 	}
 	const createUser = () => {
-		console.log(pubKey);
 		fetch('/api/insertuser', {
 			method: 'POST',
 			headers: {

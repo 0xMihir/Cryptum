@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { fromHex, toHex, hexdump } from './TKey/utils';
+	import { fromHex, toHex } from './TKey/utils';
 	import { connection } from './stores/connection';
 	import tk from '$lib/TKey';
 	import '@fontsource/roboto';
@@ -43,18 +43,14 @@
 		});
 		if (response.ok) {
 			const data = await response.json();
-			return data;
+			return data.name;
 		} else {
 			console.log('error');
 		}
 	}
-	// pass wr_zAhUEuJ3IrtO9d8t_-A
-	// user cygnusx26
-	// doesUserExist('cygnusx26', 'wr_zAhUEu').then((data) => {
-	//         console.log(data);
-	//     });
+
 	const login = async () => {
-		let port = await navigator.serial.requestPort({
+		const port = await navigator.serial.requestPort({
 			filters: [{ usbVendorId: 4615, usbProductId: 34951 }]
 		});
 		const appBin = await fetch('/app.bin');
@@ -65,7 +61,21 @@
 		const conn = await tk.TkeyConnection.connect(port);
 		connection.set(conn);
 
-		const successfulLoad = await conn.loadBinary(appBuffer);
+
+		let successfulLoad = false;
+
+		try {
+			successfulLoad = await conn.loadBinary(appBuffer);
+		} catch (e) {
+			console.log("get name")
+			const name = await conn.getNameVersion();
+			console.log(name)
+
+			if (new TextDecoder().decode(name.slice(0, 7)) == 'cryptum') {
+				successfulLoad = true;
+				console.log('Already loaded');
+			}
+		}
 
 		if (!successfulLoad) {
 			console.log('Failed to load binary');
@@ -77,7 +87,6 @@
 		const publicKey = await conn.getPublicKey();
 		// get hex string
 		const pubKey = toHex(publicKey);
-		console.log(pubKey);
 
 		const { nonce } = await getNonce();
 

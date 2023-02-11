@@ -18,7 +18,6 @@
 		}
 
 		const file = fileInput.files[0];
-		console.log(file);
 
 		reader.readAsArrayBuffer(file);
 		reader.onload = (e) => {

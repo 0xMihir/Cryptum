@@ -61,8 +61,8 @@ const cmdGetUDI = makeFirmwareCommand(0x08, CommandLength.CommandLen1);
 const rspGetUDI = makeFirmwareCommand(0x09, CommandLength.CommandLen32);
 
 // App commands
-const cmdGetNameVersion = makeFirmwareCommand(0x01, CommandLength.CommandLen1);
-const rspGetNameVersion = makeFirmwareCommand(0x02, CommandLength.CommandLen32);
+const cmdGetNameVersion = makeApplicationCommand(0x01, CommandLength.CommandLen1);
+const rspGetNameVersion = makeApplicationCommand(0x02, CommandLength.CommandLen32);
 const cmdGetPublicKey = makeApplicationCommand(0x03, CommandLength.CommandLen1);
 const rspGetPublicKey = makeApplicationCommand(0x04, CommandLength.CommandLen128);
 const cmdSetSize = makeApplicationCommand(0x05, CommandLength.CommandLen32);
@@ -78,8 +78,8 @@ const rspAEADDecrypt = makeApplicationCommand(0x0e, CommandLength.CommandLen128)
 
 export default {
 	firmwareCommands: {
-		cmdGetNameVersion,
-		rspGetNameVersion,
+		fw_cmdGetNameVersion,
+		fw_rspGetNameVersion,
 		cmdLoadApp,
 		rspLoadApp,
 		cmdLoadAppData,
