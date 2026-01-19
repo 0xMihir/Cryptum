@@ -13,7 +13,7 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-node": "^4.0.1",
-		"@sveltejs/kit": "^2.20.6",
+		"@sveltejs/kit": "^2.49.5",
 		"@types/jsonwebtoken": "^9.0.1",
 		"@types/pg": "^8.6.6",
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
